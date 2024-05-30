@@ -1,0 +1,11 @@
+- [X] Make CRUD operations
+- [X] Make serialize deserialise work
+- [x] Add timestamp field
+- [x] Make insert many
+- [X] Name itt!
+- [X] Make documentation
+- [ ] Allow for partitions  
+- [ ] Make queueing system
+- [ ] Make mutex for concurrent writes
+- [ ] Sync tables
+- [ ] Make storage to Log Structure Merge
