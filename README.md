@@ -31,7 +31,7 @@ git clone https://github.com/Jatin020403/BasaltDB.git
 ## Building 
 
 ```go
-go build
+go install
 ```
 
 ## Example Code
@@ -39,33 +39,33 @@ go build
 ### Insert Data
 
 ```sh
-./BasaltDB insert 1 69
-./BasaltDB insert 2 "Inserting string data"
-./BasaltDB insert "test data" "inserting with text data"
-./BasaltDB insert 550e8400-e29b-41d4-a716-446655440000 "Inserting with UUID"
+BasaltDB insert 1 69
+BasaltDB insert 2 "Inserting string data"
+BasaltDB insert "test data" "inserting with text data"
+BasaltDB insert 550e8400-e29b-41d4-a716-446655440000 "Inserting with UUID"
 ```
 
 ### Get Data
 ```sh
-./BasaltDB get 2 
-./BasaltDB get "test data" 
+BasaltDB get 2 
+BasaltDB get "test data" 
 ```
 
 ### View Data
 ```sh
-./BasaltDB getAll
+BasaltDB getAll
 ```
 
 ### Update Data
 BasaltDB overwrites data according to timestamp.
 
 ```sh
-./BasaltDB insert 1 69
-./BasaltDB insert 1 "Updating 69 with this string"
+BasaltDB insert 1 69
+BasaltDB insert 1 "Updating 69 with this string"
 ```
 
 ### Delete Data
 ```sh
-./BasaltDB delete 2 
-./BasaltDB delete "test data" 
+BasaltDB delete 2 
+BasaltDB delete "test data" 
 ```
