@@ -3,7 +3,10 @@ package utils
 import (
 	"encoding/gob"
 	"fmt"
+	"io"
 	"os"
+
+	"github.com/pkg/errors"
 )
 
 const DIRPATH = "./storage/bst.gob"
@@ -33,8 +36,13 @@ func Deserialize(object []ArrNode) ([]ArrNode, error) {
 	decoder := gob.NewDecoder(file)
 	err = decoder.Decode(&object)
 
+	if errors.Is(err, io.EOF) {
+		fmt.Println("File Empty")
+		return []ArrNode{}, nil
+	}
+
 	if err != nil {
-		err = fmt.Errorf(err.Error() + "Hii")
+		err = errors.New(err.Error() + " : Deserialisation failed")
 		file.Close()
 		return nil, err
 	}

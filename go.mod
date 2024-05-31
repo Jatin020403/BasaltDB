@@ -2,7 +2,10 @@ module github.com/Jatin020403/BasaltDB
 
 go 1.21.6
 
-require github.com/spf13/cobra v1.8.0
+require (
+	github.com/pkg/errors v0.9.1
+	github.com/spf13/cobra v1.8.0
+)
 
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
