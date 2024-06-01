@@ -41,15 +41,16 @@ go install
 
 ```sh
 BasaltDB insert 1 69
-BasaltDB insert 2 "Inserting string data"
-BasaltDB insert "test data" "inserting with text data"
+BasaltDB insert -k 2 -v "Inserting string data"
+BasaltDB insert --key "test data" --value "inserting with text data"
 BasaltDB insert 550e8400-e29b-41d4-a716-446655440000 "Inserting with UUID"
 ```
 
 ### Get Data
 ```sh
 BasaltDB get 2 
-BasaltDB get "test data" 
+BasaltDB get -k "test data"
+BasaltDB get --key 1 
 ```
 
 ### View Data
@@ -62,11 +63,12 @@ BasaltDB overwrites data according to timestamp.
 
 ```sh
 BasaltDB insert 1 69
-BasaltDB insert 1 "Updating 69 with this string"
+BasaltDB insert -k 1 -v "Updating 69 with this string"
 ```
 
 ### Delete Data
 ```sh
 BasaltDB delete 2 
 BasaltDB delete "test data" 
+BasaltDB delete --key 1 
 ```
