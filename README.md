@@ -31,6 +31,7 @@ git clone https://github.com/Jatin020403/BasaltDB.git
 ## Building 
 
 ```go
+go build
 go install
 ```
 

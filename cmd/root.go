@@ -20,12 +20,5 @@ func Execute() {
 	}
 }
 
-var key string
-var value string
-
 func init() {
-	rootCmd.Flags().StringVarP(&key, "key", "k", "default", "key (required)")
-	rootCmd.Flags().StringVarP(&value, "value", "v", "default", "value (required)")
-
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

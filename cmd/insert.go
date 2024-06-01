@@ -15,11 +15,29 @@ var insertCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if len(args) != 2 {
-			fmt.Println("Length of args must be 2")
-			return
+		var key, value string
+		var err error
+
+		key, err = cmd.Flags().GetString("key")
+		if err != nil {
+			fmt.Println(err.Error())
 		}
-		if database.InsertOne(args[0], args[1]) {
+		value, err = cmd.Flags().GetString("value")
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		if key == "" || value == "" {
+			if len(args) != 2 || err != nil {
+				fmt.Println("Invalid input format. \nPass input as key value pair, or with -k -v flags")
+				cmd.Help()
+				return
+			}
+			key = args[0]
+			value = args[1]
+		}
+
+		if database.InsertOne(key, value) {
 			fmt.Println("insert success")
 		} else {
 			fmt.Println("insert failed")
@@ -29,6 +47,6 @@ var insertCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(insertCmd)
-	rootCmd.MarkFlagRequired("key")
-	rootCmd.MarkFlagRequired("value")
+	insertCmd.Flags().StringP("key", "k", "", "Input key")
+	insertCmd.Flags().StringP("value", "v", "", "Input value")
 }

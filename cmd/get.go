@@ -14,11 +14,25 @@ var getCmd = &cobra.Command{
 	Long:  `This command gets value from database.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) != 1 {
-			fmt.Println("Length of args must be 1")
-			return
+
+		var key string
+		var err error
+
+		key, err = cmd.Flags().GetString("key")
+		if err != nil {
+			fmt.Println(err.Error())
 		}
-		res, err := database.GetOne(args[0])
+
+		if key == "" || err != nil {
+			if len(args) != 1 {
+				fmt.Println("Invalid input format. \nPass key with key, -k or as single string")
+				cmd.Help()
+				return
+			}
+			key = args[0]
+		}
+
+		res, err := database.GetOne(key)
 
 		if err != nil {
 			fmt.Println(err.Error())
@@ -31,5 +45,5 @@ var getCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(getCmd)
 
-	rootCmd.MarkFlagRequired("key")
+	getCmd.Flags().StringP("key", "k", "", "Input key")
 }

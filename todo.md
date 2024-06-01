@@ -6,6 +6,8 @@
 - [X] Make documentation
 - [ ] Allow for partitions  
 - [ ] Make queueing system
+- [ ] Dockerize it
+- [ ] Write tests
 - [ ] Make mutex for concurrent writes
 - [ ] Sync tables
 - [ ] Make storage to Log Structure Merge

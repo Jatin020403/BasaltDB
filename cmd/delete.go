@@ -14,12 +14,25 @@ var deleteCmd = &cobra.Command{
 	Long:  `This command deletes from database.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) != 1 {
-			fmt.Println("Length of args must be 1")
-			return
+
+		var key string
+		var err error
+
+		key, err = cmd.Flags().GetString("key")
+		if err != nil {
+			fmt.Println(err.Error())
 		}
-		err := database.DeleteNode(args[0])
-		if err {
+
+		if key == "" {
+			if len(args) != 1 || err != nil {
+				fmt.Println("Invalid input format. \nPass key with key, -k or as single string")
+				cmd.Help()
+				return
+			}
+			key = args[0]
+		}
+
+		if database.DeleteNode(key) {
 			fmt.Println("delete success")
 		} else {
 			fmt.Println("delete failed")
@@ -29,5 +42,5 @@ var deleteCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-	rootCmd.MarkFlagRequired("key")
+	deleteCmd.Flags().StringP("key", "k", "", "Input key")
 }
