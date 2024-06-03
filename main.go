@@ -2,13 +2,12 @@ package main
 
 import (
 	"github.com/Jatin020403/BasaltDB/cmd"
-	"github.com/Jatin020403/BasaltDB/utils"
+	"github.com/Jatin020403/BasaltDB/database"
 )
 
 func main() {
-	utils.InitialiseQueue()
+	database.Initialise()
 	// go database.InsertLoop()
 	cmd.Execute()
-	// database.GetAll()
 
 }
