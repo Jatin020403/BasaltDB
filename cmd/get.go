@@ -32,7 +32,12 @@ var getCmd = &cobra.Command{
 			key = args[0]
 		}
 
-		res, err := database.GetOne(key)
+		partition, err := rootCmd.Flags().GetString("use")
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		res, err := database.GetOne(partition, key)
 
 		if err != nil {
 			fmt.Println(err.Error())

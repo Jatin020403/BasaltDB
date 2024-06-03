@@ -2,7 +2,9 @@ package database
 
 import (
 	"container/heap"
+	"errors"
 	"fmt"
+	"os"
 
 	"github.com/Jatin020403/BasaltDB/utils"
 )
@@ -30,13 +32,17 @@ func NewNode(key string, value string, timestamp int64) *utils.Node {
 	return node
 }
 
-func getRoot() (*utils.Node, error) {
+func getRoot(partition string) (*utils.Node, error) {
 	var arr []utils.ArrNode
-	object, err := utils.Deserialize(arr)
+	object, err := utils.Deserialize(partition, arr)
+
+	if errors.Is(err, os.ErrNotExist) {
+		fmt.Println("Partition does not exist : " + partition)
+		return nil, errors.New("getRoot : " + err.Error())
+	}
 
 	if err != nil {
-		fmt.Println(err.Error() + " : getRoot")
-		return nil, err
+		return nil, errors.New("getRoot : " + err.Error())
 	}
 
 	var root *utils.Node
@@ -48,10 +54,10 @@ func getRoot() (*utils.Node, error) {
 	return root, nil
 }
 
-func putRoot(node *utils.Node) error {
-	err := utils.Serialize(node)
+func putRoot(partition string, node *utils.Node) error {
+	err := utils.Serialize(partition, node)
 	if err != nil {
-		fmt.Println(err.Error() + " : putRoot")
+		fmt.Println("putRoot : " + err.Error())
 		return err
 	}
 	return nil

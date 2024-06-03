@@ -19,7 +19,13 @@ var getAllcmd = &cobra.Command{
 			fmt.Println("Length of args must be 0")
 			return
 		}
-		database.GetAll()
+
+		partition, err := rootCmd.Flags().GetString("use")
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		database.GetAll(partition)
 
 	},
 }

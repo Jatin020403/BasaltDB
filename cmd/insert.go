@@ -37,7 +37,14 @@ var insertCmd = &cobra.Command{
 			value = args[1]
 		}
 
-		if database.InsertOne(key, value) {
+		var partition string
+
+		partition, err = rootCmd.Flags().GetString("use")
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		if database.InsertOne(partition, key, value) {
 			fmt.Println("insert success")
 		} else {
 			fmt.Println("insert failed")
@@ -49,4 +56,5 @@ func init() {
 	rootCmd.AddCommand(insertCmd)
 	insertCmd.Flags().StringP("key", "k", "", "Input key")
 	insertCmd.Flags().StringP("value", "v", "", "Input value")
+	insertCmd.MarkFlagsRequiredTogether("key", "value")
 }

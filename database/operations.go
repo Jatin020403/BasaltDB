@@ -8,6 +8,7 @@ import (
 	"github.com/Jatin020403/BasaltDB/utils"
 )
 
+/*
 func InsertLoop() {
 	var lock bool
 	lock = false
@@ -26,10 +27,11 @@ func InsertLoop() {
 	}
 
 }
+*/
 
-func InsertOne(key string, value string) bool {
+func InsertOne(partition string, key string, value string) bool {
 
-	root, err := getRoot()
+	root, err := getRoot(partition)
 	if err != nil {
 		fmt.Println(err.Error())
 		return false
@@ -37,7 +39,7 @@ func InsertOne(key string, value string) bool {
 
 	root = insert(root, utils.Node{Key: key, Value: value, Timestamp: time.Now().UnixNano()})
 
-	if err := putRoot(root); err != nil {
+	if err := putRoot(partition, root); err != nil {
 		fmt.Println(err.Error())
 		return false
 	}
@@ -52,16 +54,16 @@ func InsertOneNew(key string, value string) bool {
 	return true
 }
 
-func MassInserts() bool {
+func MassInserts(partition string) bool {
 
-	root, err := getRoot()
+	root, err := getRoot(partition)
 	if err != nil {
 		fmt.Println(err.Error())
 		return false
 	}
 	root = insert_pq(root)
 
-	if err := putRoot(root); err != nil {
+	if err := putRoot(partition, root); err != nil {
 		fmt.Println(err.Error())
 		return false
 	}
@@ -69,16 +71,16 @@ func MassInserts() bool {
 	return true
 }
 
-func DeleteNode(key string) bool {
+func DeleteNode(partition string, key string) bool {
 
-	root, err := getRoot()
+	root, err := getRoot(partition)
 	if err != nil {
 		fmt.Println(err.Error())
 		return false
 	}
 	root = delete(root, key)
 
-	if err := putRoot(root); err != nil {
+	if err := putRoot(partition, root); err != nil {
 		fmt.Println(err.Error())
 		return false
 	}
@@ -87,8 +89,8 @@ func DeleteNode(key string) bool {
 
 }
 
-func GetOne(key string) (string, error) {
-	root, err := getRoot()
+func GetOne(partition string, key string) (string, error) {
+	root, err := getRoot(partition)
 	if err != nil {
 		fmt.Println(err.Error())
 		return "", err
@@ -99,8 +101,8 @@ func GetOne(key string) (string, error) {
 	return "", fmt.Errorf("not found")
 }
 
-func GetAll() {
-	root, err := getRoot()
+func GetAll(partition string) {
+	root, err := getRoot(partition)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
