@@ -4,7 +4,7 @@
 - [x] Make insert many
 - [X] Name itt!
 - [X] Make documentation
-- [ ] Allow for partitions  
+- [X] Allow for partitions  
 - [ ] Make queueing system
 - [ ] Dockerize it
 - [ ] Write tests
