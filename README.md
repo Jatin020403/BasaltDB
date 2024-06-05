@@ -6,7 +6,7 @@ BasaltDB is a SQLite and LevelDB inspired key-value database. It runs from a sin
 
   * Data is in form of Key and Value pair of String type.
   * Data is stored in different partitions.
-  * Data is overwritten with according to most recent timestamp with nanosecond precision, as a future feature of allowing multiple access.
+  * Data is overwritten with according to most recent timestamp with nanosecond precision, as a future feature to allow writes from multiple nodes.
   * Basic data operations are 
     * insert val1 val2
     * delete val1
@@ -23,6 +23,7 @@ BasaltDB is a SQLite and LevelDB inspired key-value database. It runs from a sin
 # Limitations
 
   * Each read or write involves loading the entire database. Data can be split between partitions to avoid heavy operations.
+  * Writes are done with strings as keys.
   * Mass writes are to be implemented and are in the TODO pipeline. 
 
 # Getting started 
