@@ -238,3 +238,11 @@ func print(root *utils.Node, indent string, last bool) {
 		print(root.Right, indent, true)
 	}
 }
+
+func Print_inorder(root *utils.Node) {
+	if root != nil {
+		Print_inorder(root.Left)
+		fmt.Println(root.Key + " : " + root.Value)
+		Print_inorder(root.Right)
+	}
+}

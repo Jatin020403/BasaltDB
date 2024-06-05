@@ -44,10 +44,10 @@ var insertCmd = &cobra.Command{
 			fmt.Println(err.Error())
 		}
 
-		if database.InsertOne(partition, key, value) {
-			fmt.Println("insert success")
+		if err = database.InsertOne(partition, key, value); err != nil {
+			fmt.Println(err.Error())
 		} else {
-			fmt.Println("insert failed")
+			fmt.Println("insert successful")
 		}
 	},
 }

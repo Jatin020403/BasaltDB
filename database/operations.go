@@ -2,6 +2,7 @@ package database
 
 import (
 	"container/heap"
+	"errors"
 	"fmt"
 	"time"
 
@@ -29,22 +30,34 @@ func InsertLoop() {
 }
 */
 
-func InsertOne(partition string, key string, value string) bool {
+func InsertOne(partition string, key string, value string) error {
+
+	if partition == "" {
+		return errors.New("InsertOne : invalid partition")
+	}
+
+	if key == "" {
+		return errors.New("InsertOne : invalid key")
+	}
+
+	if value == "" {
+		return errors.New("InsertOne : invalid value")
+	}
 
 	root, err := getRoot(partition)
 	if err != nil {
 		fmt.Println(err.Error())
-		return false
+		return errors.New("InsertOne : " + err.Error())
 	}
 
 	root = insert(root, utils.Node{Key: key, Value: value, Timestamp: time.Now().UnixNano()})
 
 	if err := putRoot(partition, root); err != nil {
 		fmt.Println(err.Error())
-		return false
+		return errors.New("InsertOne : " + err.Error())
 	}
 
-	return true
+	return nil
 }
 
 func InsertOneNew(key string, value string) bool {
@@ -71,21 +84,29 @@ func MassInserts(partition string) bool {
 	return true
 }
 
-func DeleteNode(partition string, key string) bool {
+func DeleteOne(partition string, key string) error {
+
+	if partition == "" {
+		return errors.New("DeleteOne : invalid partition")
+	}
+
+	if key == "" {
+		return errors.New("DeleteOne : invalid key")
+	}
 
 	root, err := getRoot(partition)
 	if err != nil {
 		fmt.Println(err.Error())
-		return false
+		return errors.New("DeleteOne : " + err.Error())
 	}
 	root = delete(root, key)
 
 	if err := putRoot(partition, root); err != nil {
 		fmt.Println(err.Error())
-		return false
+		return errors.New("DeleteOne : " + err.Error())
 	}
 
-	return true
+		return nil
 
 }
 
@@ -101,7 +122,7 @@ func GetOne(partition string, key string) (string, error) {
 	return "", fmt.Errorf("not found")
 }
 
-func GetAll(partition string) {
+func GetTree(partition string) {
 	root, err := getRoot(partition)
 	if err != nil {
 		fmt.Println(err.Error())

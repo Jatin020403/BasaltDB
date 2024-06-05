@@ -8,9 +8,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func checkFileExists(filePath string) bool {
+func CheckFileExists(filePath string) bool {
 	_, error := os.Stat(filePath)
-	//return !os.IsNotExist(err)
 	return !errors.Is(error, os.ErrNotExist)
 }
 
@@ -18,11 +17,11 @@ func checkFileExists(filePath string) bool {
 func CINEPartition(partition string) error {
 	var DIRPATH = "./storage/" + partition + ".gob"
 
-	if isFileExist := checkFileExists(DIRPATH); !isFileExist {
+	if isFileExist := CheckFileExists(DIRPATH); !isFileExist {
 		if _, err := os.Create(DIRPATH); err != nil {
 			return err
 		}
-	}else{
+	} else {
 		return errors.New("partition does not exist")
 	}
 
@@ -33,18 +32,18 @@ func CINEPartition(partition string) error {
 func DINEPartition(partition string) error {
 	var DIRPATH = "./storage/" + partition + ".gob"
 
-	if isFileExist := checkFileExists(DIRPATH); isFileExist {
+	if isFileExist := CheckFileExists(DIRPATH); isFileExist {
 		if err := os.Remove(DIRPATH); err != nil {
 			return err
 		}
-	} else{
+	} else {
 		return errors.New("partition does not exist")
 	}
 
 	return nil
 }
 
-func Serialize(partition string,node *Node) error {
+func Serialize(partition string, node *Node) error {
 	var DIRPATH = "./storage/" + partition + ".gob"
 
 	object := bsf(node)
@@ -62,7 +61,7 @@ func Serialize(partition string,node *Node) error {
 	return err
 }
 
-func Deserialize(partition string ,object []ArrNode) ([]ArrNode, error) {
+func Deserialize(partition string, object []ArrNode) ([]ArrNode, error) {
 	var DIRPATH = "./storage/" + partition + ".gob"
 
 	file, err := os.Open(DIRPATH)
@@ -70,7 +69,7 @@ func Deserialize(partition string ,object []ArrNode) ([]ArrNode, error) {
 	if err != nil {
 
 		if errors.Is(err, os.ErrNotExist) {
-			return nil, errors.New("Partition does not exist")
+			return nil, errors.New(partition + " Partition does not exist")
 		}
 
 		return nil, errors.New("deserialisation : " + err.Error())

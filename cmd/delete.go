@@ -37,10 +37,10 @@ var deleteCmd = &cobra.Command{
 			fmt.Println(err.Error())
 		}
 
-		if database.DeleteNode(partition, key) {
-			fmt.Println("delete success")
+		if err = database.DeleteOne(partition, key); err != nil {
+			fmt.Println(err.Error())
 		} else {
-			fmt.Println("delete failed")
+			fmt.Println("delete success")
 		}
 	},
 }
