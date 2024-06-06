@@ -1,5 +1,6 @@
 # Database
 storage/*
+bin/*
 
 # Executable
 BasaltDB

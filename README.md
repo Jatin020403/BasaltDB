@@ -36,9 +36,16 @@ git clone https://github.com/Jatin020403/BasaltDB.git
 
 ## Building 
 
-```go
-go build
-go install
+Build the file and add ./bin directory to the path
+```sh
+make build
+```
+
+## Test
+
+Run tests with 
+```sh
+make test
 ```
 
 ## Data Operations
@@ -47,60 +54,60 @@ go install
 
 ```sh
 # Default Partition
-BasaltDB insert 1 69                        
-BasaltDB insert -k 2 -v "Inserting string data"
+basaltdb insert 1 69                        
+basaltdb insert -k 2 -v "Inserting string data"
 # test1 Partition
-BasaltDB -p test1 insert --key "test data" --value "inserting with text data"
-BasaltDB -p test1 insert 550e8400-e29b-41d4-a716-446655440000 "Inserting with UUID"
+basaltdb -p test1 insert --key "test data" --value "inserting with text data"
+basaltdb -p test1 insert 550e8400-e29b-41d4-a716-446655440000 "Inserting with UUID"
 ```
 
 ### Get Data
 ```sh
 # Default Partition
-BasaltDB get 2 
-BasaltDB get -k "test data"
+basaltdb get 2 
+basaltdb get -k "test data"
 # test1 Partition
-BasaltDB -p test1 get --key 1 
+basaltdb -p test1 get --key 1 
 ```
 
 ### View Data
 ```sh
 # Default Partition
-BasaltDB getAll
+basaltdb getAll
 # test1 Partition
-BasaltDB -p test1 getAll
+basaltdb -p test1 getAll
 ```
 
 ### Update Data
-BasaltDB overwrites data according to timestamp.
+basaltdb overwrites data according to timestamp.
 
 ```sh
 # test1 Partition
-BasaltDB -p test1 insert -k 1 -v "Updating 69 with this string"
+basaltdb -p test1 insert -k 1 -v "Updating 69 with this string"
 ```
 
 ### Delete Data
 ```sh
 # Default Partition
-BasaltDB delete 2 
-BasaltDB delete "test data" 
+basaltdb delete 2 
+basaltdb delete "test data" 
 # test1 Partition
-BasaltDB -p test1 delete --key 1 
+basaltdb -p test1 delete --key 1 
 ```
 
 ## Partition Operations
 
 ### Create Partition
 ```sh
-BasaltDB createPartition -p test1
+basaltdb createPartition -p test1
 ```
 
 ### Get All Partitions
 ```sh
-BasaltDB getPartitions
+basaltdb getPartitions
 ```
 
 ### Delete Partition
 ```sh
-BasaltDB deletePartition -p test1
+basaltdb deletePartition -p test1
 ```
