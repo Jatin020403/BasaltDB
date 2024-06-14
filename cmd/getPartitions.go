@@ -3,6 +3,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 */
 package cmd
 
+/*
 import (
 	"fmt"
 
@@ -30,3 +31,4 @@ var getPartitionsCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(getPartitionsCmd)
 }
+*/

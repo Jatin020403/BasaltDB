@@ -6,10 +6,11 @@
 - [X] Make documentation
 - [X] Allow for partitions  
 - [X] Write tests
-- [ ] Hashing for keys
+- [X] Hashing for keys
+- [ ] Add sharding of data
+- [ ] Feasibility of RAFT
 - [ ] Make queueing system for inserts
 - [ ] Make InsertMany  
 - [ ] Dockerize it
-- [ ] Make mutex for concurrent writes
 - [ ] Sync tables
 - [ ] Make storage to Log Structure Merge

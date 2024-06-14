@@ -7,6 +7,11 @@ BasaltDB is a SQLite and LevelDB inspired key-value database. It runs from a sin
   * Data is in form of Key and Value pair of String type.
   * Data is stored in different partitions.
   * Data is overwritten with according to most recent timestamp with nanosecond precision, as a future feature to allow writes from multiple nodes.
+  * Key is hashed in the following way:
+    * [MurmurHash3](https://github.com/aappleby/smhasher/wiki/MurmurHash3) (64bit) + first 5 characters of Key. 
+    *  Dummy value is inserted if key length is less than 5. This is done to reduce chances of collision.
+    *  Murmur3 is chosen for it's fast speed and even spread of keys.
+    *  It also has been shown to have [collisions](https://emboss.github.io/blog/2012/12/14/breaking-murmur-hash-flooding-dos-reloaded/). Hence the 5 characters of key is appended to it. 
   * Basic data operations are 
     * insert val1 val2
     * delete val1

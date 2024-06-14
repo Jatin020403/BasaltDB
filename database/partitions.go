@@ -2,8 +2,6 @@ package database
 
 import (
 	"errors"
-	"path/filepath"
-	"strings"
 
 	"github.com/Jatin020403/BasaltDB/utils"
 )
@@ -24,6 +22,7 @@ func DeletePartition(partitionName string) error {
 	return nil
 }
 
+/*
 func GetAllPartitions() ([]string, error) {
 	files, err := filepath.Glob("storage/*.gob")
 	if err != nil {
@@ -41,3 +40,4 @@ func GetAllPartitions() ([]string, error) {
 	}
 	return pt, nil
 }
+*/
