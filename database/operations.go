@@ -50,7 +50,8 @@ func InsertOne(partition string, key string, value string) error {
 		return errors.New("InsertOne : " + err.Error())
 	}
 
-	root = insert(root, utils.Node{Key: key, Value: value, Timestamp: time.Now().UnixNano()})
+	hashedKey := utils.MurmurHash(key)
+	root = insert(root, utils.Node{Key: hashedKey, Value: value, Timestamp: time.Now().UnixNano()})
 
 	if err := putRoot(partition, root); err != nil {
 		fmt.Println(err.Error())
@@ -61,8 +62,9 @@ func InsertOne(partition string, key string, value string) error {
 }
 
 func InsertOneNew(key string, value string) bool {
+	hashedKey := utils.MurmurHash(key)
 
-	heap.Push(&utils.PQ, NewNode(key, value, time.Now().UnixNano()))
+	heap.Push(&utils.PQ, NewNode(hashedKey, value, time.Now().UnixNano()))
 
 	return true
 }
@@ -99,7 +101,8 @@ func DeleteOne(partition string, key string) error {
 		fmt.Println(err.Error())
 		return errors.New("DeleteOne : " + err.Error())
 	}
-	root = delete(root, key)
+	hashedKey := utils.MurmurHash(key)
+	root = delete(root, hashedKey)
 
 	if err := putRoot(partition, root); err != nil {
 		fmt.Println(err.Error())
@@ -116,7 +119,8 @@ func GetOne(partition string, key string) (string, error) {
 		fmt.Println(err.Error())
 		return "", err
 	}
-	if node := get(root, key); node != nil {
+	hashedKey := utils.MurmurHash(key)
+	if node := get(root, hashedKey); node != nil {
 		return node.Value, nil
 	}
 	return "", fmt.Errorf("not found")

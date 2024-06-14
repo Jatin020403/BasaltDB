@@ -5,7 +5,8 @@
 - [X] Name itt!
 - [X] Make documentation
 - [X] Allow for partitions  
-- [ ] Write tests
+- [X] Write tests
+- [ ] Hashing for keys
 - [ ] Make queueing system for inserts
 - [ ] Make InsertMany  
 - [ ] Dockerize it
