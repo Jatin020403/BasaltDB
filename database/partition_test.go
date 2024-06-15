@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	_ "github.com/Jatin020403/BasaltDB/test_init"
-	"github.com/Jatin020403/BasaltDB/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,13 +26,13 @@ func TestCreatePartition(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var DIRPATH = "./storage/" + tt.args.partition + ".gob"
+			// var DIRPATH = "./" + tt.args.partition + "/"
+			// var FILEPATH = DIRPATH + tt.args.partition + ".gob"
 			err := CreatePartition(tt.args.partition)
 			// assert.Error(t, nil, err)
 			assert.NoError(t, err)
 
-			got := utils.CheckFileExists(DIRPATH)
-			assert.Equal(t, tt.want, got)
+			assert.DirExists(t, tt.args.partition)
 
 			err = DeletePartition(tt.args.partition)
 			assert.NoError(t, err)
@@ -60,13 +59,12 @@ func TestDeletePartition(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			CreatePartition(tt.args.partition)
-			var DIRPATH = "./storage/" + tt.args.partition + ".gob"
-			err := DeletePartition(tt.args.partition)
-			// assert.Error(t, nil, err)
+			err := CreatePartition(tt.args.partition)
 			assert.NoError(t, err)
-			got := utils.CheckFileExists(DIRPATH)
-			assert.Equal(t, tt.want, got)
+			assert.DirExists(t, tt.args.partition)
+			err = DeletePartition(tt.args.partition)
+			assert.NoError(t, err)
+			assert.NoDirExists(t, tt.args.partition)
 		})
 	}
 }
@@ -85,7 +83,7 @@ func TestDeletePartition(t *testing.T) {
 // 	for _, tt := range tests {
 // 		t.Run(tt.name, func(t *testing.T) {
 
-// 			files, err := filepath.Glob("storage/*.gob")
+// 			files, err := filepath.Glob(""+tt.args.partition+"/*.gob")
 
 // 			assert.NoError(t, err)
 
@@ -99,7 +97,7 @@ func TestDeletePartition(t *testing.T) {
 // 				pt = append(pt, strings.Split((strings.Split(file, "/")[1]), ".gob")[0])
 // 			}
 
-// 			got := !utils.CheckFileExists(DIRPATH)
+// 			got := !utils.CheckPathExists(DIRPATH)
 // 			assert.Equal(t, tt.want, got)
 // 		})
 // 	}

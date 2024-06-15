@@ -1,5 +1,5 @@
 # Database
-storage/*
+*/*.gob
 bin/*
 
 # Executable

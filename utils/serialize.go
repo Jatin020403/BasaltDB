@@ -13,58 +13,46 @@ func CheckPathExists(path string) error {
 	return err
 }
 
-func CINEFile(partition string) error {
-	var DIRPATH = "./" + partition + "/" + partition + ".gob"
-
-	err := CheckPathExists(DIRPATH)
-	if err != nil {
-		if !os.IsNotExist(err) {
-			return err
-		}
-	}
-
-	if _, err = os.Create(DIRPATH); err != nil {
-		return err
-	}
-
-	return nil
-
-}
-
 // Create If Not Exist
 func CINEPartition(partition string) error {
-	var DIR = partition
 
-	err := CheckPathExists(DIR)
+	err := CheckPathExists(partition)
+	if err == nil {
+		return errors.New("partition already exists")
+	}
 	if err != nil {
 		if !os.IsNotExist(err) {
 			return err
 		}
 	}
 
-	if err = os.Mkdir(DIR, os.ModePerm); err != nil {
+	if err = os.Mkdir(partition, os.ModePerm); err != nil {
 		return err
 	}
 
-	if err = CINEFile(partition); err != nil {
+	PATH := "./" + partition + "/" + partition + ".gob"
+
+	if _,err = os.Create(PATH); err != nil {
 		return err
 	}
+
+	// Initialise_shard(partition)
 
 	return nil
 }
 
 // Delete If Not Exist
 func DINEPartition(partition string) error {
-	var DIR = partition
+	err := CheckPathExists(partition)
 
-	err := CheckPathExists(DIR)
 	if err != nil {
-		if !os.IsNotExist(err) {
-			return err
+		if os.IsNotExist(err) {
+			return errors.New("partition does not exist")
 		}
+		return err
 	}
 
-	if err = os.RemoveAll(DIR); err != nil {
+	if err = os.RemoveAll(partition); err != nil {
 		return err
 	}
 
@@ -75,18 +63,19 @@ func Serialize(partition string, node *Node) error {
 
 	// Check Partition exists
 	if err := CheckPathExists(partition); err != nil {
+		if os.IsNotExist(err) {
+			return errors.New(partition + " partition does not exist")
+		}
+
 		return err
 	}
 
-	var DIRPATH = "./" + partition + "/" + partition + ".gob"
+	var PATH = "./" + partition + "/" + partition + ".gob"
 
 	// Check file exists
-	if err := CheckPathExists(DIRPATH); err != nil {
+	if err := CheckPathExists(PATH); err != nil {
 		if os.IsNotExist(err) {
-			err = CINEFile(DIRPATH)
-			if err != nil {
-				return err
-			}
+			return errors.New(partition + " shard does not exist")
 		} else {
 			return err
 		}
@@ -94,7 +83,7 @@ func Serialize(partition string, node *Node) error {
 
 	object := bsf(node)
 
-	file, err := os.Create(DIRPATH)
+	file, err := os.Create(PATH)
 
 	if err == nil {
 		encoder := gob.NewEncoder(file)
@@ -110,31 +99,26 @@ func Serialize(partition string, node *Node) error {
 func Deserialize(partition string, object []ArrNode) ([]ArrNode, error) {
 	// Check Partition exists
 	if err := CheckPathExists(partition); err != nil {
+		if os.IsNotExist(err) {
+			return nil, errors.New(partition + " partition does not exist")
+		}
 		return nil, err
 	}
 
-	var DIRPATH = "./" + partition + "/" + partition + ".gob"
+	var PATH = "./" + partition + "/" + partition + ".gob"
 
 	// Check file exists
-	if err := CheckPathExists(DIRPATH); err != nil {
+	if err := CheckPathExists(PATH); err != nil {
 		if os.IsNotExist(err) {
-			err = CINEFile(DIRPATH)
-			if err != nil {
-				return nil, err
-			}
+			return nil, errors.New(partition + " shard does not exist")
 		} else {
 			return nil, err
 		}
 	}
 
-	file, err := os.Open(DIRPATH)
+	file, err := os.Open(PATH)
 
 	if err != nil {
-
-		if errors.Is(err, os.ErrNotExist) {
-			return nil, errors.New(partition + " Partition does not exist")
-		}
-
 		return nil, errors.New("deserialisation : " + err.Error())
 	}
 

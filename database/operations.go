@@ -46,7 +46,6 @@ func InsertOne(partition string, key string, value string) error {
 
 	root, err := getRoot(partition)
 	if err != nil {
-		fmt.Println(err.Error())
 		return errors.New("InsertOne : " + err.Error())
 	}
 
@@ -98,14 +97,12 @@ func DeleteOne(partition string, key string) error {
 
 	root, err := getRoot(partition)
 	if err != nil {
-		fmt.Println(err.Error())
 		return errors.New("DeleteOne : " + err.Error())
 	}
 	hashedKey := utils.MurmurHash(key)
 	root = delete(root, hashedKey)
 
 	if err := putRoot(partition, root); err != nil {
-		fmt.Println(err.Error())
 		return errors.New("DeleteOne : " + err.Error())
 	}
 
@@ -116,7 +113,6 @@ func DeleteOne(partition string, key string) error {
 func GetOne(partition string, key string) (string, error) {
 	root, err := getRoot(partition)
 	if err != nil {
-		fmt.Println(err.Error())
 		return "", err
 	}
 	hashedKey := utils.MurmurHash(key)

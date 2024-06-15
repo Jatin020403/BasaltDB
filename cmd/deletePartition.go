@@ -16,7 +16,6 @@ var deletePartitionCmd = &cobra.Command{
 	Short: "Deletes Partitions",
 	Long:  `Enter the partition name to delete the partition if it exists`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("deletePartition called")
 		PartitionName, err := cmd.Flags().GetString("use")
 		if err != nil {
 			fmt.Println(err.Error())

@@ -37,7 +37,6 @@ func getRoot(partition string) (*utils.Node, error) {
 	object, err := utils.Deserialize(partition, arr)
 
 	if errors.Is(err, os.ErrNotExist) {
-		fmt.Println("Partition does not exist : " + partition)
 		return nil, errors.New("getRoot : " + err.Error())
 	}
 
@@ -57,7 +56,6 @@ func getRoot(partition string) (*utils.Node, error) {
 func putRoot(partition string, node *utils.Node) error {
 	err := utils.Serialize(partition, node)
 	if err != nil {
-		fmt.Println("putRoot : " + err.Error())
 		return err
 	}
 	return nil
