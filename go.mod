@@ -7,6 +7,7 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
 	github.com/twmb/murmur3 v1.1.8
+	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
