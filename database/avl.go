@@ -32,9 +32,9 @@ func NewNode(key string, value string, timestamp int64) *utils.Node {
 	return node
 }
 
-func getRoot(partition string) (*utils.Node, error) {
+func getRoot(partition string, shard int) (*utils.Node, error) {
 	var arr []utils.ArrNode
-	object, err := utils.Deserialize(partition, arr)
+	object, err := utils.Deserialize(partition, shard, arr)
 
 	if errors.Is(err, os.ErrNotExist) {
 		return nil, errors.New("getRoot : " + err.Error())
@@ -53,8 +53,38 @@ func getRoot(partition string) (*utils.Node, error) {
 	return root, nil
 }
 
-func putRoot(partition string, node *utils.Node) error {
-	err := utils.Serialize(partition, node)
+func getAllRoot(partition string) (*utils.Node, error) {
+
+	conf, err := utils.GetConfig(partition)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+
+	var root *utils.Node
+	for shard := 0; shard < conf.ShardCount; shard++ {
+		var arr []utils.ArrNode
+
+		object, err := utils.Deserialize(partition, shard, arr)
+
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, errors.New("getRoot : " + err.Error())
+		}
+
+		if err != nil {
+			return nil, errors.New("getRoot : " + err.Error())
+		}
+
+		for _, i := range object {
+			root = insert(root, *NewNode(i.Key, i.Value, i.Timestamp))
+		}
+	}
+
+	return root, nil
+}
+
+func putRoot(partition string, shard int, node *utils.Node) error {
+	err := utils.Serialize(partition, shard, node)
 	if err != nil {
 		return err
 	}

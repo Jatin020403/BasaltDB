@@ -9,28 +9,27 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type shards struct{
-	loc string `yaml:"loc"`
-
+type shards struct {
+	Loc string `yaml:"loc"`
 }
 
-type defaultConfig struct {
-	ShardCount int8	`yaml:"shardCount"`
-	Shards []shards `yaml:"shards"`
+type Config struct {
+	ShardCount int      `yaml:"shardCount"`
+	Shards     []shards `yaml:"shards"`
 }
 
-var defaultShardcount int = 3
+var defaultShardcount int = 5
 
-func Initialise_shard(partition string) error {
+func InitialiseShard(partition string) error {
 
 	for i := 0; i < defaultShardcount; i++ {
-		if _, err := os.Create("./" + partition + "/" + partition + "_" + fmt.Sprint(i)); err != nil {
+		if _, err := os.Create("./" + partition + "/" + partition + "_" + fmt.Sprint(i) + ".gob"); err != nil {
 			return err
 		}
 	}
 
-	c := defaultConfig{
-		ShardCount: int8(defaultShardcount),
+	c := Config{
+		ShardCount: defaultShardcount,
 	}
 
 	out, err := yaml.Marshal(c)
@@ -49,7 +48,30 @@ func Initialise_shard(partition string) error {
 		return err
 	}
 
-	fmt.Println(out)
-
 	return nil
+}
+
+func GetConfig(partition string) (Config, error) {
+	var CONFIGPATH = "./" + partition + "/config.yaml"
+	f, err := os.ReadFile(CONFIGPATH)
+	var conf Config
+
+	if err != nil {
+		return Config{}, err
+	}
+
+	if err := yaml.Unmarshal(f, &conf); err != nil {
+		return Config{}, err
+	}
+
+	return conf, nil
+}
+
+func GetShard(partition string, key string) (int, error) {
+	conf, err := GetConfig(partition)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(MurmurHashInt(key) % uint64(conf.ShardCount)), nil
 }

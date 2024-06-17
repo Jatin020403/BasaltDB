@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/gob"
+	"fmt"
 	"io"
 	"os"
 
@@ -20,23 +21,16 @@ func CINEPartition(partition string) error {
 	if err == nil {
 		return errors.New("partition already exists")
 	}
-	if err != nil {
-		if !os.IsNotExist(err) {
-			return err
-		}
+
+	if !os.IsNotExist(err) {
+		return err
 	}
 
 	if err = os.Mkdir(partition, os.ModePerm); err != nil {
 		return err
 	}
 
-	PATH := "./" + partition + "/" + partition + ".gob"
-
-	if _,err = os.Create(PATH); err != nil {
-		return err
-	}
-
-	// Initialise_shard(partition)
+	InitialiseShard(partition)
 
 	return nil
 }
@@ -59,7 +53,7 @@ func DINEPartition(partition string) error {
 	return nil
 }
 
-func Serialize(partition string, node *Node) error {
+func Serialize(partition string, shard int, node *Node) error {
 
 	// Check Partition exists
 	if err := CheckPathExists(partition); err != nil {
@@ -70,12 +64,12 @@ func Serialize(partition string, node *Node) error {
 		return err
 	}
 
-	var PATH = "./" + partition + "/" + partition + ".gob"
+	var PATH = "./" + partition + "/" + partition + "_" + fmt.Sprint(shard) + ".gob"
 
 	// Check file exists
 	if err := CheckPathExists(PATH); err != nil {
 		if os.IsNotExist(err) {
-			return errors.New(partition + " shard does not exist")
+			return errors.New(partition + "_" + fmt.Sprint(shard) + " shard does not exist")
 		} else {
 			return err
 		}
@@ -96,21 +90,24 @@ func Serialize(partition string, node *Node) error {
 	return err
 }
 
-func Deserialize(partition string, object []ArrNode) ([]ArrNode, error) {
+func Deserialize(partition string, shard int, object []ArrNode) ([]ArrNode, error) {
+
+	var err error
+
 	// Check Partition exists
-	if err := CheckPathExists(partition); err != nil {
+	if err = CheckPathExists(partition); err != nil {
 		if os.IsNotExist(err) {
 			return nil, errors.New(partition + " partition does not exist")
 		}
 		return nil, err
 	}
 
-	var PATH = "./" + partition + "/" + partition + ".gob"
+	var PATH = "./" + partition + "/" + partition + "_" + fmt.Sprint(shard) + ".gob"
 
 	// Check file exists
 	if err := CheckPathExists(PATH); err != nil {
 		if os.IsNotExist(err) {
-			return nil, errors.New(partition + " shard does not exist")
+			return nil, errors.New(partition + "_" + fmt.Sprint(shard) + " shard does not exist")
 		} else {
 			return nil, err
 		}

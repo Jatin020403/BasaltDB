@@ -1,7 +1,6 @@
 package database
 
 import (
-	"container/heap"
 	"errors"
 	"fmt"
 	"time"
@@ -44,15 +43,20 @@ func InsertOne(partition string, key string, value string) error {
 		return errors.New("InsertOne : invalid value")
 	}
 
-	root, err := getRoot(partition)
+	shard, err := utils.GetShard(partition, key)
+	if err != nil {
+		return err
+	}
+
+	root, err := getRoot(partition, shard)
 	if err != nil {
 		return errors.New("InsertOne : " + err.Error())
 	}
 
 	hashedKey := utils.MurmurHash(key)
 	root = insert(root, utils.Node{Key: hashedKey, Value: value, Timestamp: time.Now().UnixNano()})
-
-	if err := putRoot(partition, root); err != nil {
+	
+	if err := putRoot(partition, shard, root); err != nil {
 		fmt.Println(err.Error())
 		return errors.New("InsertOne : " + err.Error())
 	}
@@ -60,30 +64,30 @@ func InsertOne(partition string, key string, value string) error {
 	return nil
 }
 
-func InsertOneNew(key string, value string) bool {
-	hashedKey := utils.MurmurHash(key)
+// func InsertOneNew(key string, value string) bool {
+// 	hashedKey := utils.MurmurHash(key)
 
-	heap.Push(&utils.PQ, NewNode(hashedKey, value, time.Now().UnixNano()))
+// 	heap.Push(&utils.PQ, NewNode(hashedKey, value, time.Now().UnixNano()))
 
-	return true
-}
+// 	return true
+// }
 
-func MassInserts(partition string) bool {
+// func MassInserts(partition string) bool {
 
-	root, err := getRoot(partition)
-	if err != nil {
-		fmt.Println(err.Error())
-		return false
-	}
-	root = insert_pq(root)
+// 	root, err := getRoot(partition)
+// 	if err != nil {
+// 		fmt.Println(err.Error())
+// 		return false
+// 	}
+// 	root = insert_pq(root)
 
-	if err := putRoot(partition, root); err != nil {
-		fmt.Println(err.Error())
-		return false
-	}
+// 	if err := putRoot(partition, root); err != nil {
+// 		fmt.Println(err.Error())
+// 		return false
+// 	}
 
-	return true
-}
+// 	return true
+// }
 
 func DeleteOne(partition string, key string) error {
 
@@ -95,26 +99,39 @@ func DeleteOne(partition string, key string) error {
 		return errors.New("DeleteOne : invalid key")
 	}
 
-	root, err := getRoot(partition)
+	shard, err := utils.GetShard(partition, key)
+	if err != nil {
+		return err
+	}
+
+	root, err := getRoot(partition, shard)
 	if err != nil {
 		return errors.New("DeleteOne : " + err.Error())
 	}
+	
 	hashedKey := utils.MurmurHash(key)
 	root = delete(root, hashedKey)
 
-	if err := putRoot(partition, root); err != nil {
+	if err := putRoot(partition, shard, root); err != nil {
 		return errors.New("DeleteOne : " + err.Error())
 	}
 
-		return nil
+	return nil
 
 }
 
 func GetOne(partition string, key string) (string, error) {
-	root, err := getRoot(partition)
+
+	shard, err := utils.GetShard(partition, key)
 	if err != nil {
 		return "", err
 	}
+
+	root, err := getRoot(partition, shard)
+	if err != nil {
+		return "", err
+	}
+
 	hashedKey := utils.MurmurHash(key)
 	if node := get(root, hashedKey); node != nil {
 		return node.Value, nil
@@ -123,7 +140,8 @@ func GetOne(partition string, key string) (string, error) {
 }
 
 func GetTree(partition string) {
-	root, err := getRoot(partition)
+
+	root, err := getAllRoot(partition)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
