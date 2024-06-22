@@ -2,7 +2,6 @@ package utils
 
 import (
 	"encoding/gob"
-	"fmt"
 	"io"
 	"os"
 
@@ -14,46 +13,7 @@ func CheckPathExists(path string) error {
 	return err
 }
 
-// Create If Not Exist
-func CINEPartition(partition string) error {
-
-	err := CheckPathExists(partition)
-	if err == nil {
-		return errors.New("partition already exists")
-	}
-
-	if !os.IsNotExist(err) {
-		return err
-	}
-
-	if err = os.Mkdir(partition, os.ModePerm); err != nil {
-		return err
-	}
-
-	InitialiseShard(partition)
-
-	return nil
-}
-
-// Delete If Not Exist
-func DINEPartition(partition string) error {
-	err := CheckPathExists(partition)
-
-	if err != nil {
-		if os.IsNotExist(err) {
-			return errors.New("partition does not exist")
-		}
-		return err
-	}
-
-	if err = os.RemoveAll(partition); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Serialize(partition string, shard int, node *Node) error {
+func Serialize(partition string, part int, node *Node) error {
 
 	// Check Partition exists
 	if err := CheckPathExists(partition); err != nil {
@@ -64,12 +24,15 @@ func Serialize(partition string, shard int, node *Node) error {
 		return err
 	}
 
-	var PATH = "./" + partition + "/" + partition + "_" + fmt.Sprint(shard) + ".gob"
+	path, err := GetPathFromPart(partition, part)
+	if err != nil {
+		return err
+	}
 
 	// Check file exists
-	if err := CheckPathExists(PATH); err != nil {
+	if err := CheckPathExists(path); err != nil {
 		if os.IsNotExist(err) {
-			return errors.New(partition + "_" + fmt.Sprint(shard) + " shard does not exist")
+			return errors.New(path + " does not exist")
 		} else {
 			return err
 		}
@@ -77,7 +40,7 @@ func Serialize(partition string, shard int, node *Node) error {
 
 	object := bsf(node)
 
-	file, err := os.Create(PATH)
+	file, err := os.Create(path)
 
 	if err == nil {
 		encoder := gob.NewEncoder(file)
@@ -90,7 +53,7 @@ func Serialize(partition string, shard int, node *Node) error {
 	return err
 }
 
-func Deserialize(partition string, shard int, object []ArrNode) ([]ArrNode, error) {
+func Deserialize(partition string, part int, object []ArrNode) ([]ArrNode, error) {
 
 	var err error
 
@@ -102,18 +65,21 @@ func Deserialize(partition string, shard int, object []ArrNode) ([]ArrNode, erro
 		return nil, err
 	}
 
-	var PATH = "./" + partition + "/" + partition + "_" + fmt.Sprint(shard) + ".gob"
+	path, err := GetPathFromPart(partition, part)
+	if err != nil {
+		return nil, err
+	}
 
 	// Check file exists
-	if err := CheckPathExists(PATH); err != nil {
+	if err := CheckPathExists(path); err != nil {
 		if os.IsNotExist(err) {
-			return nil, errors.New(partition + "_" + fmt.Sprint(shard) + " shard does not exist")
+			return nil, errors.New(path + " does not exist")
 		} else {
 			return nil, err
 		}
 	}
 
-	file, err := os.Open(PATH)
+	file, err := os.Open(path)
 
 	if err != nil {
 		return nil, errors.New("deserialisation : " + err.Error())

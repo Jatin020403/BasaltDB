@@ -23,6 +23,7 @@ var getTreecmd = &cobra.Command{
 		partition, err := rootCmd.Flags().GetString("use")
 		if err != nil {
 			fmt.Println(err.Error())
+			return
 		}
 
 		database.GetTree(partition)

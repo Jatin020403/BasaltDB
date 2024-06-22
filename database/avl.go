@@ -1,7 +1,6 @@
 package database
 
 import (
-	"container/heap"
 	"errors"
 	"fmt"
 	"os"
@@ -32,9 +31,9 @@ func NewNode(key string, value string, timestamp int64) *utils.Node {
 	return node
 }
 
-func getRoot(partition string, shard int) (*utils.Node, error) {
+func getRoot(partition string, part int) (*utils.Node, error) {
 	var arr []utils.ArrNode
-	object, err := utils.Deserialize(partition, shard, arr)
+	object, err := utils.Deserialize(partition, part, arr)
 
 	if errors.Is(err, os.ErrNotExist) {
 		return nil, errors.New("getRoot : " + err.Error())
@@ -62,10 +61,10 @@ func getAllRoot(partition string) (*utils.Node, error) {
 	}
 
 	var root *utils.Node
-	for shard := 0; shard < conf.ShardCount; shard++ {
+	for part := 0; part < conf.PartCount; part++ {
 		var arr []utils.ArrNode
 
-		object, err := utils.Deserialize(partition, shard, arr)
+		object, err := utils.Deserialize(partition, part, arr)
 
 		if errors.Is(err, os.ErrNotExist) {
 			return nil, errors.New("getRoot : " + err.Error())
@@ -83,8 +82,8 @@ func getAllRoot(partition string) (*utils.Node, error) {
 	return root, nil
 }
 
-func putRoot(partition string, shard int, node *utils.Node) error {
-	err := utils.Serialize(partition, shard, node)
+func putRoot(partition string, part int, node *utils.Node) error {
+	err := utils.Serialize(partition, part, node)
 	if err != nil {
 		return err
 	}
@@ -116,20 +115,6 @@ func get_balance_factor(N *utils.Node) int {
 		return 0
 	}
 	return height(N.Left) - height(N.Right)
-}
-
-func insert_pq(root *utils.Node) *utils.Node {
-
-	for utils.PQ.Len() > 0 {
-		node := heap.Pop(&utils.PQ).(*utils.Node)
-		if node != nil {
-			root = insert(root, *node)
-			fmt.Println("Hiiiii " + node.Key + " - " + node.Value + " " + fmt.Sprint(utils.PQ.Len()))
-		}
-	}
-
-	return root
-
 }
 
 func insert(node *utils.Node, newNode utils.Node) *utils.Node {

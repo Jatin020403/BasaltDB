@@ -10,11 +10,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// createPartitionCmd represents the createPartition command
-var createPartitionCmd = &cobra.Command{
-	Use:   "createPartition",
-	Short: "Creates partition",
-	Long:  `Enter the partition name to create partition`,
+// initCmd represents the init command
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Initialise configuration for a partition",
+	Long: `Get template for a configuration YAML file for creating a partition.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		PartitionName, err := cmd.Flags().GetString("use")
 		if err != nil {
@@ -25,15 +25,16 @@ var createPartitionCmd = &cobra.Command{
 			return
 		}
 
-		err = database.CreatePartition(PartitionName)
+		err = database.CreateTemplate(PartitionName)
 		if err != nil {
 			fmt.Println(err.Error())
 			return
 		}
-		fmt.Println("Partition " + PartitionName + " created")
+
+		fmt.Println("Partition " + PartitionName + " initialised")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(createPartitionCmd)
+	rootCmd.AddCommand(initCmd)
 }

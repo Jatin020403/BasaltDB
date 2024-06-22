@@ -6,8 +6,16 @@ import (
 	"github.com/Jatin020403/BasaltDB/utils"
 )
 
+func CreateTemplate(partitionName string) error {
+	err := utils.InitialiseTemplate(partitionName)
+	if err != nil {
+		return errors.New("CreatePartition : " + err.Error())
+	}
+	return nil
+}
+
 func CreatePartition(partitionName string) error {
-	err := utils.CINEPartition(partitionName)
+	err := utils.InitialisePartition(partitionName)
 	if err != nil {
 		return errors.New("CreatePartition : " + err.Error())
 	}

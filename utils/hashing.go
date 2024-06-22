@@ -10,7 +10,7 @@ func MurmurHashInt(key string) uint64{
 	return murmur.StringSum64(key)
 }
 
-func MurmurHash(key string) string {
+func MurmurHashMod(key string) string {
 	hash := fmt.Sprint(MurmurHashInt(key))
 
 	for len(key) < 5{
