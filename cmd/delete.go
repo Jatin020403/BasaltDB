@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Jatin020403/BasaltDB/database"
+	"github.com/Jatin020403/BasaltDB/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +38,9 @@ var deleteCmd = &cobra.Command{
 			fmt.Println(err.Error())
 		}
 
-		if err = database.DeleteOne(partition, key); err != nil {
+		hashedKey := utils.MurmurHashInt(key)
+
+		if err = database.DeleteOne(partition, hashedKey); err != nil {
 			fmt.Println(err.Error())
 		} else {
 			fmt.Println("delete success")

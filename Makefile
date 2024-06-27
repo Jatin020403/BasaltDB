@@ -2,7 +2,6 @@
 
 build: 
 	@go build -o bin/basaltdb
-	@./bin/basaltdb $(filter-out $@,$(MAKECMDGOALS))
 
 run: build
 	@./bin/basaltdb $(filter-out $@,$(MAKECMDGOALS))

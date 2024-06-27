@@ -21,5 +21,5 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringP("use", "p", "default", "Set partition")
+	rootCmd.PersistentFlags().StringP("use", "p", "default", "Use partition")
 }

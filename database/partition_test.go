@@ -10,6 +10,7 @@ import (
 func TestCreatePartition(t *testing.T) {
 	type args struct {
 		partition string
+		n         int
 	}
 
 	tests := []struct {
@@ -19,7 +20,7 @@ func TestCreatePartition(t *testing.T) {
 	}{
 		{
 			name: "should create partition",
-			args: args{"test_partition"},
+			args: args{"test_partition", 5},
 			want: true,
 		},
 	}
@@ -28,7 +29,9 @@ func TestCreatePartition(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// var DIRPATH = "./" + tt.args.partition + "/"
 			// var FILEPATH = DIRPATH + tt.args.partition + ".gob"
-			err := CreatePartition(tt.args.partition)
+			err := CreateTemplate(tt.args.partition, tt.args.n)
+			assert.NoError(t, err)
+			err = CreatePartition(tt.args.partition)
 			// assert.Error(t, nil, err)
 			assert.NoError(t, err)
 

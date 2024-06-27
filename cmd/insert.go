@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Jatin020403/BasaltDB/database"
+	"github.com/Jatin020403/BasaltDB/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -44,7 +45,9 @@ var insertCmd = &cobra.Command{
 			fmt.Println(err.Error())
 		}
 
-		if err = database.InsertOne(partition, key, value); err != nil {
+		hashedKey := utils.MurmurHashInt(key)
+
+		if err = database.InsertOne(partition, hashedKey, value); err != nil {
 			fmt.Println(err.Error())
 		} else {
 			fmt.Println("insert successful")

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Jatin020403/BasaltDB/database"
+	"github.com/Jatin020403/BasaltDB/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +38,9 @@ var getCmd = &cobra.Command{
 			fmt.Println(err.Error())
 		}
 
-		res, err := database.GetOne(partition, key)
+		hashedKey := utils.MurmurHashInt(key)
+
+		res, err := database.GetOne(partition, hashedKey)
 
 		if err != nil {
 			fmt.Println(err.Error())

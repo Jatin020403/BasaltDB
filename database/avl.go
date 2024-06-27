@@ -15,14 +15,14 @@ func max(a, b int) int {
 	return b
 }
 
-func height(N *utils.Node) int {
-	if N == nil {
+func height(n *utils.Node) int {
+	if n == nil {
 		return 0
 	}
-	return N.Height
+	return n.Height
 }
 
-func NewNode(key string, value string, timestamp int64) *utils.Node {
+func NewNode(key uint64, value string, timestamp int64) *utils.Node {
 	node := &utils.Node{Key: key, Value: value}
 	node.Left = nil
 	node.Right = nil
@@ -47,36 +47,6 @@ func getRoot(partition string, part int) (*utils.Node, error) {
 
 	for _, i := range object {
 		root = insert(root, *NewNode(i.Key, i.Value, i.Timestamp))
-	}
-
-	return root, nil
-}
-
-func getAllRoot(partition string) (*utils.Node, error) {
-
-	conf, err := utils.GetConfig(partition)
-	if err != nil {
-		fmt.Println(err.Error())
-		return nil, err
-	}
-
-	var root *utils.Node
-	for part := 0; part < conf.PartCount; part++ {
-		var arr []utils.ArrNode
-
-		object, err := utils.Deserialize(partition, part, arr)
-
-		if errors.Is(err, os.ErrNotExist) {
-			return nil, errors.New("getRoot : " + err.Error())
-		}
-
-		if err != nil {
-			return nil, errors.New("getRoot : " + err.Error())
-		}
-
-		for _, i := range object {
-			root = insert(root, *NewNode(i.Key, i.Value, i.Timestamp))
-		}
 	}
 
 	return root, nil
@@ -167,7 +137,7 @@ func node_with_minimum_value(node *utils.Node) *utils.Node {
 	return current
 }
 
-func delete(root *utils.Node, key string) *utils.Node {
+func delete(root *utils.Node, key uint64) *utils.Node {
 
 	if root == nil {
 		return root
@@ -221,7 +191,7 @@ func delete(root *utils.Node, key string) *utils.Node {
 	return root
 }
 
-func get(node *utils.Node, key string) *utils.Node {
+func get(node *utils.Node, key uint64) *utils.Node {
 	if node == nil {
 		return nil
 	}
@@ -232,30 +202,32 @@ func get(node *utils.Node, key string) *utils.Node {
 	}
 
 	return node
-
 }
 
-func print(root *utils.Node, indent string, last bool) {
-	if root != nil {
-		fmt.Print(indent)
-		if last {
-			fmt.Print("R----")
-			indent += "   "
-		} else {
-			fmt.Print("L----")
-			indent += "|  "
-		}
-
-		fmt.Println(" " + root.Key + "==>" + root.Value + " Timestamp: " + fmt.Sprint(root.Timestamp))
-		print(root.Left, indent, false)
-		print(root.Right, indent, true)
+func printRoot(root *utils.Node, indent string, last bool) {
+	if root == nil {
+		return
 	}
+
+	fmt.Print(indent)
+	if last {
+		fmt.Print("R----")
+		indent += "   "
+	} else {
+		fmt.Print("L----")
+		indent += "|  "
+	}
+	fmt.Println(" " + fmt.Sprint(root.Key) + "==>" + root.Value + " Timestamp: " + fmt.Sprint(root.Timestamp))
+
+	printRoot(root.Left, indent, false)
+	printRoot(root.Right, indent, true)
+
 }
 
 func Print_inorder(root *utils.Node) {
 	if root != nil {
 		Print_inorder(root.Left)
-		fmt.Println(root.Key + " : " + root.Value)
+		fmt.Println(fmt.Sprint(root.Key) + " : " + root.Value)
 		Print_inorder(root.Right)
 	}
 }

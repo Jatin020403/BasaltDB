@@ -17,6 +17,7 @@ var initCmd = &cobra.Command{
 	Long: `Get template for a configuration YAML file for creating a partition.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		PartitionName, err := cmd.Flags().GetString("use")
+		n, err := cmd.Flags().GetInt("size")
 		if err != nil {
 			fmt.Println(err.Error())
 		}
@@ -25,7 +26,7 @@ var initCmd = &cobra.Command{
 			return
 		}
 
-		err = database.CreateTemplate(PartitionName)
+		err = database.CreateTemplate(PartitionName, n)
 		if err != nil {
 			fmt.Println(err.Error())
 			return
@@ -37,4 +38,6 @@ var initCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(initCmd)
+	initCmd.PersistentFlags().IntP("size", "n", 3, "size of initial partition")
+
 }

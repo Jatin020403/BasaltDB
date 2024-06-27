@@ -17,25 +17,25 @@ var initDefaultCmd = &cobra.Command{
 	Long:  `Get default partition working.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		default_partition := "default"
+		partitionName, err := cmd.Flags().GetString("use")
+		if err!= nil{
+			fmt.Println(err.Error())
+			return 
+		}
+		n, err := cmd.Flags().GetInt("size")
+		if err!= nil{
+			fmt.Println(err.Error())
+			return 
+		}
 
-		database.CreateTemplate(default_partition)
-		database.CreatePartition(default_partition)
+		database.CreateTemplate(partitionName, n)
+		database.CreatePartition(partitionName)
 
-		fmt.Println("Partition " + default_partition + " initialised")
+		fmt.Println("Partition " + partitionName + " initialised")
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(initDefaultCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// initDefaultCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// initDefaultCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	initDefaultCmd.PersistentFlags().IntP("size", "n", 3, "size of initial partition")
 }

@@ -1,7 +1,7 @@
 package utils
 
 type Node struct {
-	Key       string
+	Key       uint64
 	Value     string
 	Left      *Node
 	Right     *Node
@@ -10,7 +10,7 @@ type Node struct {
 }
 
 type ArrNode struct {
-	Key       string
+	Key       uint64
 	Value     string
 	Timestamp int64
 }

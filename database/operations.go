@@ -8,34 +8,13 @@ import (
 	"github.com/Jatin020403/BasaltDB/utils"
 )
 
-/*
-func InsertLoop() {
-	var lock bool
-	lock = false
-	t1 := time.Now()
-	for {
-		if !lock && utils.PQ.Len() > 0 {
-			t1 = time.Now()
-			lock = true
-		}
-		if utils.PQ.Len() > 20 || (time.Since(t1).Seconds() > 5 && lock) {
-			MassInserts()
-			lock = false
-		}
-		time.Sleep(1 * time.Second)
-		fmt.Println("Hiiiii " + fmt.Sprint(utils.PQ.Len()))
-	}
-
-}
-*/
-
-func InsertOne(partition string, key string, value string) error {
+func InsertOne(partition string, key uint64, value string) error {
 
 	if partition == "" {
 		return errors.New("InsertOne : invalid partition")
 	}
 
-	if key == "" {
+	if key == 0 {
 		return errors.New("InsertOne : invalid key")
 	}
 
@@ -53,8 +32,7 @@ func InsertOne(partition string, key string, value string) error {
 		return errors.New("InsertOne : " + err.Error())
 	}
 
-	hashedKey := utils.MurmurHashMod(key)
-	root = insert(root, utils.Node{Key: hashedKey, Value: value, Timestamp: time.Now().UnixNano()})
+	root = insert(root, utils.Node{Key: key, Value: value, Timestamp: time.Now().UnixNano()})
 
 	if err := putRoot(partition, part, root); err != nil {
 		return errors.New("InsertOne : " + err.Error())
@@ -63,13 +41,13 @@ func InsertOne(partition string, key string, value string) error {
 	return nil
 }
 
-func DeleteOne(partition string, key string) error {
+func DeleteOne(partition string, key uint64) error {
 
 	if partition == "" {
 		return errors.New("DeleteOne : invalid partition")
 	}
 
-	if key == "" {
+	if key == 0 {
 		return errors.New("DeleteOne : invalid key")
 	}
 
@@ -83,8 +61,7 @@ func DeleteOne(partition string, key string) error {
 		return errors.New("DeleteOne : " + err.Error())
 	}
 
-	hashedKey := utils.MurmurHashMod(key)
-	root = delete(root, hashedKey)
+	root = delete(root, key)
 
 	if err := putRoot(partition, part, root); err != nil {
 		return errors.New("DeleteOne : " + err.Error())
@@ -94,7 +71,7 @@ func DeleteOne(partition string, key string) error {
 
 }
 
-func GetOne(partition string, key string) (string, error) {
+func GetOne(partition string, key uint64) (string, error) {
 
 	part, err := utils.GetPartNumber(partition, key)
 	if err != nil {
@@ -106,8 +83,7 @@ func GetOne(partition string, key string) (string, error) {
 		return "", err
 	}
 
-	hashedKey := utils.MurmurHashMod(key)
-	if node := get(root, hashedKey); node != nil {
+	if node := get(root, key); node != nil {
 		return node.Value, nil
 	}
 	return "", fmt.Errorf("not found")
@@ -115,10 +91,17 @@ func GetOne(partition string, key string) (string, error) {
 
 func GetTree(partition string) {
 
-	root, err := getAllRoot(partition)
+	conf, err := utils.ReadConfig(partition)
 	if err != nil {
 		fmt.Println(err.Error())
-		return
 	}
-	print(root, "", true)
+
+	for k := range conf.PartsMap {
+		root, err := getRoot(partition, k)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		printRoot(root, "", true)
+	}
 }
