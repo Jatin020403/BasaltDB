@@ -1,14 +1,14 @@
 package utils
 
-// A PriorityQueue implements heap.Interface and holds Items.
-type PriorityQueue []*Node
+import "github.com/Jatin020403/BasaltDB/models"
+
+type PriorityQueue []*models.Node
 
 var PQ PriorityQueue
 
 func (PQ PriorityQueue) Len() int { return len(PQ) }
 
 func (PQ PriorityQueue) Less(i, j int) bool {
-	// We want Pop to give us the highest, not lowest, priority so we use greater than here.
 	if PQ[i] == nil {
 		return false
 	}
@@ -23,7 +23,7 @@ func (PQ PriorityQueue) Swap(i, j int) {
 }
 
 func (PQ *PriorityQueue) Push(x any) {
-	item := x.(*Node)
+	item := x.(*models.Node)
 	*PQ = append(*PQ, item)
 }
 

@@ -5,12 +5,12 @@
 - [X] Name itt!
 - [X] Make documentation
 - [X] Allow for partitions  
-- [X] Write tests
+- [X] Write tests (out of date)
 - [X] Hashing for keys
-- [ ] Add sharding of data
-- [ ] Feasibility of RAFT
-- [ ] Make queueing system for inserts
-- [ ] Make InsertMany  
-- [ ] Dockerize it
-- [ ] Sync tables
-- [ ] Make storage to Log Structure Merge
+- [X] Add partitioning of data
+- [X] Allowed rebalancing of data
+- [X] Make Partition struct with config to reduce number of config repeated conf reads
+- [ ] Make Partitions into methods 
+- [ ] Remove timestamp field
+- [ ] Rewrite tests
+- [ ] Update ReadMe

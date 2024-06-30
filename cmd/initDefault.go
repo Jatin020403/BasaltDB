@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/Jatin020403/BasaltDB/database"
+	"github.com/Jatin020403/BasaltDB/models"
 	"github.com/spf13/cobra"
 )
 
@@ -18,18 +19,29 @@ var initDefaultCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		partitionName, err := cmd.Flags().GetString("use")
-		if err!= nil{
+		if err != nil {
 			fmt.Println(err.Error())
-			return 
+			return
 		}
 		n, err := cmd.Flags().GetInt("size")
-		if err!= nil{
+		if err != nil {
 			fmt.Println(err.Error())
-			return 
+			return
 		}
 
-		database.CreateTemplate(partitionName, n)
-		database.CreatePartition(partitionName)
+		var partition models.Partition
+		partition.Name = partitionName
+
+		partition, err = database.CreateTemplate(partition, n)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		partition, err = database.CreatePartition(partition)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
 
 		fmt.Println("Partition " + partitionName + " initialised")
 	},

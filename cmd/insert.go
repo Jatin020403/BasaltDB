@@ -38,11 +38,15 @@ var insertCmd = &cobra.Command{
 			value = args[1]
 		}
 
-		var partition string
-
-		partition, err = rootCmd.Flags().GetString("use")
+		partitionName, err := rootCmd.Flags().GetString("use")
 		if err != nil {
 			fmt.Println(err.Error())
+		}
+
+		partition, err := database.CollectPartition(partitionName)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
 		}
 
 		hashedKey := utils.MurmurHashInt(key)

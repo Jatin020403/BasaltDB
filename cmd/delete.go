@@ -33,9 +33,15 @@ var deleteCmd = &cobra.Command{
 			key = args[0]
 		}
 
-		partition, err := rootCmd.Flags().GetString("use")
+		partitionName, err := rootCmd.Flags().GetString("use")
 		if err != nil {
 			fmt.Println(err.Error())
+		}
+
+		partition, err := database.CollectPartition(partitionName)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
 		}
 
 		hashedKey := utils.MurmurHashInt(key)

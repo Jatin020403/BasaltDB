@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/Jatin020403/BasaltDB/database"
+	"github.com/Jatin020403/BasaltDB/models"
 	"github.com/spf13/cobra"
 )
 
@@ -14,25 +15,28 @@ import (
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialise configuration for a partition",
-	Long: `Get template for a configuration YAML file for creating a partition.`,
+	Long:  `Get template for a configuration YAML file for creating a partition.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		PartitionName, err := cmd.Flags().GetString("use")
+		partitionName, err := cmd.Flags().GetString("use")
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
 		n, err := cmd.Flags().GetInt("size")
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-		if PartitionName == "" || err != nil {
-			fmt.Println("Invalid Partition. Provide a string")
-			return
-		}
 
-		err = database.CreateTemplate(PartitionName, n)
+		var partition models.Partition
+		partition.Name = partitionName
+
+		partition, err = database.CreateTemplate(partition, n)
 		if err != nil {
 			fmt.Println(err.Error())
 			return
 		}
 
-		fmt.Println("Partition " + PartitionName + " initialised")
+		fmt.Println("Partition " + partitionName + " initialised")
 	},
 }
 

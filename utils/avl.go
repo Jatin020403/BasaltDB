@@ -1,11 +1,11 @@
-package database
+package utils
 
 import (
 	"errors"
 	"fmt"
 	"os"
 
-	"github.com/Jatin020403/BasaltDB/utils"
+	"github.com/Jatin020403/BasaltDB/models"
 )
 
 func max(a, b int) int {
@@ -15,15 +15,15 @@ func max(a, b int) int {
 	return b
 }
 
-func height(n *utils.Node) int {
+func height(n *models.Node) int {
 	if n == nil {
 		return 0
 	}
 	return n.Height
 }
 
-func NewNode(key uint64, value string, timestamp int64) *utils.Node {
-	node := &utils.Node{Key: key, Value: value}
+func NewNode(key uint64, value string, timestamp int64) *models.Node {
+	node := &models.Node{Key: key, Value: value}
 	node.Left = nil
 	node.Right = nil
 	node.Height = 1
@@ -31,9 +31,9 @@ func NewNode(key uint64, value string, timestamp int64) *utils.Node {
 	return node
 }
 
-func getRoot(partition string, part int) (*utils.Node, error) {
-	var arr []utils.ArrNode
-	object, err := utils.Deserialize(partition, part, arr)
+func GetRoot(partition models.Partition, part int) (*models.Node, error) {
+	var arr []models.ArrNode
+	object, err := Deserialize(partition, part, arr)
 
 	if errors.Is(err, os.ErrNotExist) {
 		return nil, errors.New("getRoot : " + err.Error())
@@ -43,24 +43,24 @@ func getRoot(partition string, part int) (*utils.Node, error) {
 		return nil, errors.New("getRoot : " + err.Error())
 	}
 
-	var root *utils.Node
+	var root *models.Node
 
 	for _, i := range object {
-		root = insert(root, *NewNode(i.Key, i.Value, i.Timestamp))
+		root = Insert(root, *NewNode(i.Key, i.Value, i.Timestamp))
 	}
 
 	return root, nil
 }
 
-func putRoot(partition string, part int, node *utils.Node) error {
-	err := utils.Serialize(partition, part, node)
+func PutRoot(partition models.Partition, part int, node *models.Node) error {
+	err := Serialize(partition, part, node)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func rightRotate(y *utils.Node) *utils.Node {
+func rightRotate(y *models.Node) *models.Node {
 	x := y.Left
 	T2 := x.Right
 	x.Right = y
@@ -70,7 +70,7 @@ func rightRotate(y *utils.Node) *utils.Node {
 	return x
 }
 
-func leftRotate(x *utils.Node) *utils.Node {
+func leftRotate(x *models.Node) *models.Node {
 	y := x.Right
 	T2 := y.Left
 	y.Left = x
@@ -80,22 +80,22 @@ func leftRotate(x *utils.Node) *utils.Node {
 	return y
 }
 
-func get_balance_factor(N *utils.Node) int {
+func get_balance_factor(N *models.Node) int {
 	if N == nil {
 		return 0
 	}
 	return height(N.Left) - height(N.Right)
 }
 
-func insert(node *utils.Node, newNode utils.Node) *utils.Node {
+func Insert(node *models.Node, newNode models.Node) *models.Node {
 
 	if node == nil {
 		return NewNode(newNode.Key, newNode.Value, newNode.Timestamp)
 	}
 	if newNode.Key < node.Key {
-		node.Left = insert(node.Left, newNode)
+		node.Left = Insert(node.Left, newNode)
 	} else if newNode.Key > node.Key {
-		node.Right = insert(node.Right, newNode)
+		node.Right = Insert(node.Right, newNode)
 	} else {
 		if newNode.Timestamp > node.Timestamp {
 			node.Value = newNode.Value
@@ -129,7 +129,7 @@ func insert(node *utils.Node, newNode utils.Node) *utils.Node {
 	return node
 }
 
-func node_with_minimum_value(node *utils.Node) *utils.Node {
+func node_with_minimum_value(node *models.Node) *models.Node {
 	current := node
 	for current.Left != nil {
 		current = current.Left
@@ -137,15 +137,15 @@ func node_with_minimum_value(node *utils.Node) *utils.Node {
 	return current
 }
 
-func delete(root *utils.Node, key uint64) *utils.Node {
+func Delete(root *models.Node, key uint64) *models.Node {
 
 	if root == nil {
 		return root
 	}
 	if key < root.Key {
-		root.Left = delete(root.Left, key)
+		root.Left = Delete(root.Left, key)
 	} else if key > root.Key {
-		root.Right = delete(root.Right, key)
+		root.Right = Delete(root.Right, key)
 	} else {
 		if root.Left == nil || root.Right == nil {
 			temp := root.Left
@@ -162,7 +162,7 @@ func delete(root *utils.Node, key uint64) *utils.Node {
 			root.Key = temp.Key
 			root.Value = temp.Value
 			root.Timestamp = temp.Timestamp
-			root.Right = delete(root.Right, temp.Key)
+			root.Right = Delete(root.Right, temp.Key)
 		}
 	}
 	if root == nil {
@@ -191,20 +191,20 @@ func delete(root *utils.Node, key uint64) *utils.Node {
 	return root
 }
 
-func get(node *utils.Node, key uint64) *utils.Node {
+func Get(node *models.Node, key uint64) *models.Node {
 	if node == nil {
 		return nil
 	}
 	if key < node.Key {
-		return get(node.Left, key)
+		return Get(node.Left, key)
 	} else if key > node.Key {
-		return get(node.Right, key)
+		return Get(node.Right, key)
 	}
 
 	return node
 }
 
-func printRoot(root *utils.Node, indent string, last bool) {
+func PrintRoot(root *models.Node, indent string, last bool) {
 	if root == nil {
 		return
 	}
@@ -219,12 +219,12 @@ func printRoot(root *utils.Node, indent string, last bool) {
 	}
 	fmt.Println(" " + fmt.Sprint(root.Key) + "==>" + root.Value + " Timestamp: " + fmt.Sprint(root.Timestamp))
 
-	printRoot(root.Left, indent, false)
-	printRoot(root.Right, indent, true)
+	PrintRoot(root.Left, indent, false)
+	PrintRoot(root.Right, indent, true)
 
 }
 
-func Print_inorder(root *utils.Node) {
+func Print_inorder(root *models.Node) {
 	if root != nil {
 		Print_inorder(root.Left)
 		fmt.Println(fmt.Sprint(root.Key) + " : " + root.Value)

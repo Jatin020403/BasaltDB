@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/Jatin020403/BasaltDB/models"
 	"github.com/pkg/errors"
 )
 
@@ -13,21 +14,18 @@ func CheckPathExists(path string) error {
 	return err
 }
 
-func Serialize(partition string, part int, node *Node) error {
+func Serialize(partition models.Partition, part int, node *models.Node) error {
 
 	// Check Partition exists
-	if err := CheckPathExists(partition); err != nil {
+	if err := CheckPathExists(partition.PartitionLoc); err != nil {
 		if os.IsNotExist(err) {
-			return errors.New(partition + " partition does not exist")
+			return errors.New(partition.Name + " partition does not exist")
 		}
 
 		return err
 	}
 
-	path, err := GetPathFromPart(partition, part)
-	if err != nil {
-		return err
-	}
+	path := partition.Conf.PartsMap[part].PartLoc
 
 	// Check file exists
 	if err := CheckPathExists(path); err != nil {
@@ -53,33 +51,30 @@ func Serialize(partition string, part int, node *Node) error {
 	return err
 }
 
-func Deserialize(partition string, part int, object []ArrNode) ([]ArrNode, error) {
+func Deserialize(partition models.Partition, part int, object []models.ArrNode) ([]models.ArrNode, error) {
 
 	var err error
 
 	// Check Partition exists
-	if err = CheckPathExists(partition); err != nil {
+	if err = CheckPathExists(partition.PartitionLoc); err != nil {
 		if os.IsNotExist(err) {
-			return nil, errors.New(partition + " partition does not exist")
+			return nil, errors.New(partition.Name + " partition does not exist")
 		}
 		return nil, err
 	}
 
-	path, err := GetPathFromPart(partition, part)
-	if err != nil {
-		return nil, err
-	}
+	pathPath := partition.Conf.PartsMap[part].PartLoc
 
 	// Check file exists
-	if err := CheckPathExists(path); err != nil {
+	if err := CheckPathExists(pathPath); err != nil {
 		if os.IsNotExist(err) {
-			return nil, errors.New(path + " does not exist")
+			return nil, errors.New(pathPath + " does not exist")
 		} else {
 			return nil, err
 		}
 	}
 
-	file, err := os.Open(path)
+	file, err := os.Open(pathPath)
 
 	if err != nil {
 		return nil, errors.New("deserialisation : " + err.Error())
@@ -89,7 +84,7 @@ func Deserialize(partition string, part int, object []ArrNode) ([]ArrNode, error
 	err = decoder.Decode(&object)
 
 	if errors.Is(err, io.EOF) {
-		return []ArrNode{}, nil
+		return []models.ArrNode{}, nil
 	}
 
 	if err != nil {

@@ -33,9 +33,15 @@ var getCmd = &cobra.Command{
 			key = args[0]
 		}
 
-		partition, err := rootCmd.Flags().GetString("use")
+		partitionName, err := rootCmd.Flags().GetString("use")
 		if err != nil {
 			fmt.Println(err.Error())
+		}
+
+		partition, err := database.CollectPartition(partitionName)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
 		}
 
 		hashedKey := utils.MurmurHashInt(key)
@@ -44,9 +50,10 @@ var getCmd = &cobra.Command{
 
 		if err != nil {
 			fmt.Println(err.Error())
-		} else {
-			fmt.Println(res)
+			return
 		}
+		fmt.Println(res)
+
 	},
 }
 

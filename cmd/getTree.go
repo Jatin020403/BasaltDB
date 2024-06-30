@@ -20,7 +20,14 @@ var getTreecmd = &cobra.Command{
 			return
 		}
 
-		partition, err := rootCmd.Flags().GetString("use")
+		var err error
+
+		partitionName, err := rootCmd.Flags().GetString("use")
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		partition, err := database.CollectPartition(partitionName)
 		if err != nil {
 			fmt.Println(err.Error())
 			return

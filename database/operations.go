@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Jatin020403/BasaltDB/models"
 	"github.com/Jatin020403/BasaltDB/utils"
 )
 
-func InsertOne(partition string, key uint64, value string) error {
+func InsertOne(partition models.Partition, key uint64, value string) error {
 
-	if partition == "" {
+	if partition.Name == "" {
 		return errors.New("InsertOne : invalid partition")
 	}
 
@@ -22,48 +23,38 @@ func InsertOne(partition string, key uint64, value string) error {
 		return errors.New("InsertOne : invalid value")
 	}
 
-	part, err := utils.GetPartNumber(partition, key)
-	if err != nil {
-		return err
-	}
+	part := int(key % uint64(partition.Conf.PartCount))
 
-	root, err := getRoot(partition, part)
+	root, err := utils.GetRoot(partition, part)
 	if err != nil {
 		return errors.New("InsertOne : " + err.Error())
 	}
 
-	root = insert(root, utils.Node{Key: key, Value: value, Timestamp: time.Now().UnixNano()})
+	root = utils.Insert(root, models.Node{Key: key, Value: value, Timestamp: time.Now().UnixNano()})
 
-	if err := putRoot(partition, part, root); err != nil {
+	if err := utils.PutRoot(partition, part, root); err != nil {
 		return errors.New("InsertOne : " + err.Error())
 	}
 
 	return nil
 }
 
-func DeleteOne(partition string, key uint64) error {
+func DeleteOne(partition models.Partition, key uint64) error {
 
-	if partition == "" {
+	if partition.Name == "" {
 		return errors.New("DeleteOne : invalid partition")
 	}
 
-	if key == 0 {
-		return errors.New("DeleteOne : invalid key")
-	}
+	part := int(key % uint64(partition.Conf.PartCount))
 
-	part, err := utils.GetPartNumber(partition, key)
-	if err != nil {
-		return err
-	}
-
-	root, err := getRoot(partition, part)
+	root, err := utils.GetRoot(partition, part)
 	if err != nil {
 		return errors.New("DeleteOne : " + err.Error())
 	}
 
-	root = delete(root, key)
+	root = utils.Delete(root, key)
 
-	if err := putRoot(partition, part, root); err != nil {
+	if err := utils.PutRoot(partition, part, root); err != nil {
 		return errors.New("DeleteOne : " + err.Error())
 	}
 
@@ -71,37 +62,31 @@ func DeleteOne(partition string, key uint64) error {
 
 }
 
-func GetOne(partition string, key uint64) (string, error) {
+func GetOne(partition models.Partition, key uint64) (string, error) {
 
-	part, err := utils.GetPartNumber(partition, key)
+	part := int(key % uint64(partition.Conf.PartCount))
+
+	root, err := utils.GetRoot(partition, part)
 	if err != nil {
 		return "", err
 	}
 
-	root, err := getRoot(partition, part)
-	if err != nil {
-		return "", err
-	}
-
-	if node := get(root, key); node != nil {
+	if node := utils.Get(root, key); node != nil {
 		return node.Value, nil
 	}
 	return "", fmt.Errorf("not found")
 }
 
-func GetTree(partition string) {
+func GetTree(partition models.Partition) {
 
-	conf, err := utils.ReadConfig(partition)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	conf := partition.Conf
 
 	for k := range conf.PartsMap {
-		root, err := getRoot(partition, k)
+		root, err := utils.GetRoot(partition, k)
 		if err != nil {
 			fmt.Println(err.Error())
 			return
 		}
-		printRoot(root, "", true)
+		utils.PrintRoot(root, "", true)
 	}
 }

@@ -19,20 +19,19 @@ To rebalance create a new_config.yaml file to with the required
 configuration in the current Partition directory.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		fmt.Println("rebalancePartition called")
-
-		PartitionName, err := cmd.Flags().GetString("use")
-
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-
-		err = database.RebalancePartition(PartitionName)
+		partitionName, err := cmd.Flags().GetString("use")
+		partition, err := database.CollectPartition(partitionName)
 
 		if err != nil {
 			fmt.Println(err.Error())
+			return
 		}
+		err = database.RebalancePartition(partition)
 
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
 	},
 }
 

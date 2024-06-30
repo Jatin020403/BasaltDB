@@ -1,4 +1,4 @@
-package utils
+package models
 
 type Node struct {
 	Key       uint64

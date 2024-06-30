@@ -1,19 +1,21 @@
 package utils
 
-func bsf(node *Node) []ArrNode {
+import "github.com/Jatin020403/BasaltDB/models"
+
+func bsf(node *models.Node) []models.ArrNode {
 	if node == nil {
-		return make([]ArrNode, 0)
+		return make([]models.ArrNode, 0)
 	}
 
-	arr := []ArrNode{}
-	q := []Node{*node}
-	var elem Node
+	arr := []models.ArrNode{}
+	q := []models.Node{*node}
+	var elem models.Node
 
 	for len(q) != 0 {
 		elem = q[0]
 		q = q[1:]
 
-		arrNode := ArrNode{Key: elem.Key, Value: elem.Value, Timestamp: elem.Timestamp}
+		arrNode := models.ArrNode{Key: elem.Key, Value: elem.Value, Timestamp: elem.Timestamp}
 		arr = append(arr, arrNode)
 
 		if elem.Left != nil {

@@ -6,133 +6,36 @@ import (
 	"os"
 	"path"
 
-	"github.com/pkg/errors"
+	"github.com/Jatin020403/BasaltDB/models"
 	"gopkg.in/yaml.v2"
 )
 
-type Parts struct {
-	Loc string `yaml:"loc"`
-}
+func InitialiseConfig(partition models.Partition, n int) (models.Partition, error) {
 
-type Config struct {
-	PartCount int           `yaml:"partCount"`
-	PartsMap  map[int]Parts `yaml:"parts"`
-}
-
-// Delete If Not Exist
-func DINEPartition(partition string) error {
-	err := CheckPathExists(partition)
-
-	if err != nil {
-		if os.IsNotExist(err) {
-			return errors.New("partition does not exist")
-		}
-		return err
-	}
-
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	confPath := path.Join(wd, partition, "config.yaml")
-	yamlFile, err := os.ReadFile(confPath)
-	if err != nil {
-		return err
-	}
-
-	var conf Config
-
-	err = yaml.Unmarshal(yamlFile, &conf)
-	if err != nil {
-		return err
-	}
-
-	if conf.PartCount != len(conf.PartsMap) {
-		return errors.New("length of parts not same as location")
-	}
-
-	for _, v := range conf.PartsMap {
-
-		if err := os.Remove(v.Loc); err != nil {
-			return err
-		}
-	}
-
-	err = os.RemoveAll(path.Join(wd, partition))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func InitialiseTemplate(partition string, n int) error {
-
-	if err := os.Mkdir(partition, os.ModePerm); err != nil {
-		return err
-	}
-
-	conf := Config{
+	conf := models.Config{
 		PartCount: n,
 	}
 
-	conf.PartsMap = make(map[int]Parts)
-
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
+	conf.PartsMap = make(map[int]models.Parts)
 
 	for i := 0; i < conf.PartCount; i++ {
-		part := partition + "_" + fmt.Sprint(i)
-		path := path.Join(wd, partition, part+".gob")
+		part := partition.Name + "_" + fmt.Sprint(i)
+		path := path.Join(partition.PartitionLoc, part+".gob")
 
-		conf.PartsMap[i] = Parts{Loc: path}
+		conf.PartsMap[i] = models.Parts{PartLoc: path}
 	}
 
-	err = WriteConfig(partition, conf)
-	if err != nil {
-		return err
-	}
-	return nil
+	partition.Conf = conf
+
+	return partition, nil
 
 }
 
-func InitialisePartition(partition string) error {
-
-	err := CheckPathExists(partition)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return errors.New("partition not initialised")
-		}
-		return err
-	}
-
-	var conf Config
-
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	confPath := path.Join(wd, partition, "config.yaml")
-	yamlFile, err := os.ReadFile(confPath)
-	if err != nil {
-		return err
-	}
-
-	err = yaml.Unmarshal(yamlFile, &conf)
-	if err != nil {
-		return err
-	}
-
-	if conf.PartCount != len(conf.PartsMap) {
-		return errors.New("length of parts not same as location")
-	}
+func InitialiseParts(conf models.Config) error {
 
 	for _, v := range conf.PartsMap {
 
-		if _, err := os.Create(v.Loc); err != nil {
+		if _, err := os.Create(v.PartLoc); err != nil {
 			return err
 		}
 	}
@@ -140,41 +43,47 @@ func InitialisePartition(partition string) error {
 	return nil
 }
 
-func ReadConfig(partition string) (Config, error) {
-	var conf Config
+func DeleteParts(conf models.Config) error {
+
+	for _, v := range conf.PartsMap {
+
+		if err := os.Remove(v.PartLoc); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func LoadConfig(partition models.Partition, confName string) (models.Partition, error) {
 
 	wd, err := os.Getwd()
 	if err != nil {
-		return Config{}, err
+		return models.Partition{}, err
 	}
-	confPath := path.Join(wd, partition, "config.yaml")
+	confPath := path.Join(wd, partition.Name, confName)
 
 	f, err := os.ReadFile(confPath)
 
 	if err != nil {
-		return Config{}, err
+		return models.Partition{}, err
 	}
 
-	if err := yaml.Unmarshal(f, &conf); err != nil {
-		return Config{}, err
+	if err := yaml.Unmarshal(f, &partition.Conf); err != nil {
+		return models.Partition{}, err
 	}
 
-	return conf, nil
+	return partition, nil
 }
 
-func WriteConfig(partition string, conf Config) error {
+func WriteConfig(partition models.Partition) error {
 
-	wd, err := os.Getwd()
+	out, err := yaml.Marshal(partition.Conf)
 	if err != nil {
 		return err
 	}
 
-	out, err := yaml.Marshal(conf)
-	if err != nil {
-		return err
-	}
-
-	confPath := path.Join(wd, partition, "config.yaml")
+	confPath := path.Join(partition.PartitionLoc, "config.yaml")
 	confFile, err := os.Create(confPath)
 	if err != nil {
 		return err
@@ -187,24 +96,4 @@ func WriteConfig(partition string, conf Config) error {
 	}
 
 	return nil
-}
-
-func GetPartNumber(partition string, key uint64) (int, error) {
-	conf, err := ReadConfig(partition)
-	if err != nil {
-		return 0, err
-	}
-
-	return int(key % uint64(conf.PartCount)), nil
-}
-
-func GetPathFromPart(partition string, part int) (string, error) {
-	conf, err := ReadConfig(partition)
-	if err != nil {
-		return "", err
-	}
-
-	path := conf.PartsMap[part].Loc
-
-	return path, err
 }
