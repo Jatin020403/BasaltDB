@@ -1,29 +1,26 @@
 # BasaltDB
 
-BasaltDB is a SQLite and LevelDB inspired key-value database. It runs from a single executable with a CLI interface and persistant storage.
+BasaltDB is a SQLite and LevelDB inspired key-value database. It runs serverless from a single executable via CLI interface. The main features is user-defined data partitioning system. 
 
 # Features
 
   * Data is in form of Key and Value pair of String type.
-  * Data is stored in different partitions.
-  * Data is overwritten with according to most recent timestamp with nanosecond precision, as a future feature to allow writes from multiple nodes.
-  * Key is hashed in the following way:
-    * [MurmurHash3](https://github.com/aappleby/smhasher/wiki/MurmurHash3) (64bit) + first 5 characters of Key. 
-    *  Dummy value is inserted if key length is less than 5. This is done to reduce chances of collision.
-    *  Murmur3 is chosen for it's fast speed and even spread of keys.
-    *  It also has been shown to have [collisions](https://emboss.github.io/blog/2012/12/14/breaking-murmur-hash-flooding-dos-reloaded/). Hence the 5 characters of key is appended to it. 
+  * This is stored as an AVL tree in a sorted by Key.
+  * Key is hashed using [MurmurHash3](https://github.com/aappleby/smhasher/wiki/MurmurHash3) (64bit). Murmur3 is chosen for it's fast speed and even spread of keys. 
   * Basic data operations are 
     * insert val1 val2
     * delete val1
     * get val1
-  * Each partition is an AVL tree with value sorted by Key.
-  * Persistant stored data is the Level Order Traversal of the AVL tree.
-  * Basic partition operations are
+  * A patition comprises of multiple parts. Each part is a file containing Level Order Traversal of AVL tree.
+  * The configuration of partition is defined in the config.yaml file. It comprises of: 
+    * number of parts
+    * map of part id and its location
+  * Basic partition operations are:
     * createPartition -p pName
     * deletePartition -p pName
-    * getPartitions
+    * rebalancePartition -p pName
   * Specify partitions with -p flag. All data operations without the -p flag are done in the "default" partition.
-  * Read and write operations are of linear time complexity. 
+  * Rebalance Partition allows the user to redistribute data in the in a new configuration. This is to be mentioned in a new_config.yaml file.
 
 # Limitations
 
@@ -33,24 +30,63 @@ BasaltDB is a SQLite and LevelDB inspired key-value database. It runs from a sin
 
 # Getting started 
 
-## Get source code 
+## Installation
+
+### Get source code 
 
 ```bash
 git clone https://github.com/Jatin020403/BasaltDB.git
 ```
 
-## Building 
+### Build
 
-Build the file and add ./bin directory to the path
 ```sh
 make build
 ```
+Build the file and add ./bin directory to the path
 
-## Test
+### Test
 
-Run tests with 
 ```sh
 make test
+```
+
+## Partition Operations
+
+### Create Partiton
+
+To create a partition, first initialise the partition. Change the config file as required. Finally create the partition.
+
+```sh
+# Initialise Partition
+basaltdb init -p test1
+
+# Adjust the config as needed 
+
+# Create Partition 
+basaltdb createPartition -p test1
+```
+
+### Create Default Partition
+
+To create default partition. This initialises and creates the the partition in the default configuration.
+
+```sh
+basaltdb initDefault
+```
+
+### Rebalance Partition
+
+In the directory of the partition, create a new file called new_config.yaml. Then run the rebalance command.
+
+```sh
+# Create new_conf.yaml file with new conf
+basaltdb rebalancePartition -p test1
+```
+
+### Delete Partition
+```sh
+basaltdb deletePartition -p test1
 ```
 
 ## Data Operations
@@ -59,8 +95,8 @@ make test
 
 ```sh
 # Default Partition
-basaltdb insert 1 69                        
 basaltdb insert -k 2 -v "Inserting string data"
+basaltdb insert 1 69                        
 # test1 Partition
 basaltdb -p test1 insert --key "test data" --value "inserting with text data"
 basaltdb -p test1 insert 550e8400-e29b-41d4-a716-446655440000 "Inserting with UUID"
@@ -69,8 +105,8 @@ basaltdb -p test1 insert 550e8400-e29b-41d4-a716-446655440000 "Inserting with UU
 ### Get Data
 ```sh
 # Default Partition
-basaltdb get 2 
 basaltdb get -k "test data"
+basaltdb get 2 
 # test1 Partition
 basaltdb -p test1 get --key 1 
 ```
@@ -98,21 +134,4 @@ basaltdb delete 2
 basaltdb delete "test data" 
 # test1 Partition
 basaltdb -p test1 delete --key 1 
-```
-
-## Partition Operations
-
-### Create Partition
-```sh
-basaltdb createPartition -p test1
-```
-
-### Get All Partitions
-```sh
-basaltdb getPartitions
-```
-
-### Delete Partition
-```sh
-basaltdb deletePartition -p test1
 ```
