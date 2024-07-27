@@ -3,8 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/Jatin020403/BasaltDB/database"
-	"github.com/Jatin020403/BasaltDB/utils"
+	"github.com/Jatin020403/BasaltDB/handlers"
 	"github.com/spf13/cobra"
 )
 
@@ -43,19 +42,7 @@ var insertCmd = &cobra.Command{
 			fmt.Println(err.Error())
 		}
 
-		partition, err := database.CollectPartition(partitionName)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
-
-		hashedKey := utils.MurmurHashInt(key)
-
-		if err = database.InsertOne(partition, hashedKey, value); err != nil {
-			fmt.Println(err.Error())
-		} else {
-			fmt.Println("insert successful")
-		}
+		handlers.InsertOneHandler(partitionName, key, value)
 	},
 }
 

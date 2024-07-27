@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/Jatin020403/BasaltDB/database"
+	"github.com/Jatin020403/BasaltDB/handlers"
 	"github.com/spf13/cobra"
 )
 
@@ -27,13 +27,7 @@ var getTreecmd = &cobra.Command{
 			fmt.Println(err.Error())
 		}
 
-		partition, err := database.CollectPartition(partitionName)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
-
-		database.GetTree(partition)
+		handlers.GetTreeHandler(partitionName)
 
 	},
 }

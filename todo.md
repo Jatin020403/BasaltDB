@@ -1,16 +1,7 @@
-- [X] Make CRUD operations
-- [X] Make serialize deserialise work
-- [x] Add timestamp field
-- [x] Make insert many
-- [X] Name itt!
-- [X] Make documentation
-- [X] Allow for partitions  
-- [X] Write tests (out of date)
-- [X] Hashing for keys
-- [X] Add partitioning of data
-- [X] Allowed rebalancing of data
-- [X] Make Partition struct with config to reduce number of config repeated conf reads
+- [ ] Make the Partition truly sharded
+  - [ ] Create a server component for CRUD on individual parts
+  - [ ] change config to read whether locally or remotely stored  
+- [ ] Log structured merge for faster read and write
+- [ ] RAFT implementation on the database
 - [ ] Make Partitions into methods 
-- [ ] Remove timestamp field
-- [ ] Rewrite tests
-- [ ] Update ReadMe
+- [ ] Write tests

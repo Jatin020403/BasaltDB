@@ -6,7 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/Jatin020403/BasaltDB/database"
+	"github.com/Jatin020403/BasaltDB/handlers"
 	"github.com/spf13/cobra"
 )
 
@@ -25,19 +25,7 @@ var createPartitionCmd = &cobra.Command{
 			return
 		}
 
-		partition, err := database.CollectPartition(partitionName)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
-
-		partition, err = database.CreatePartition(partition)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
-
-		fmt.Println("Partition " + partitionName + " created")
+		handlers.CreatePartitionHandler(partitionName)
 	},
 }
 

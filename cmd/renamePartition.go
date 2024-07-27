@@ -6,7 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/Jatin020403/BasaltDB/database"
+	"github.com/Jatin020403/BasaltDB/handlers"
 	"github.com/spf13/cobra"
 )
 
@@ -34,12 +34,7 @@ var renamePartitionCmd = &cobra.Command{
 			return
 		}
 
-		fromPartition, err := database.CollectPartition(oldP)
-		toPartition, err := database.CollectPartition(newP)
-
-		database.RenamePartition(fromPartition, toPartition)
-
-		database.DeletePartition(fromPartition)
+		handlers.RenamePartitionHandler(oldP, newP)
 
 	},
 }

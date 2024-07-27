@@ -6,7 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/Jatin020403/BasaltDB/database"
+	"github.com/Jatin020403/BasaltDB/handlers"
 	"github.com/spf13/cobra"
 )
 
@@ -26,18 +26,7 @@ var deletePartitionCmd = &cobra.Command{
 			return
 		}
 
-		partition, err := database.CollectPartition(partitionName)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
-
-		err = database.DeletePartition(partition)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
-		fmt.Println("Partition " + partitionName + " deleted")
+		handlers.DeletePartitionHandler(partitionName)
 
 	},
 }

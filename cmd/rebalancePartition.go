@@ -6,7 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/Jatin020403/BasaltDB/database"
+	"github.com/Jatin020403/BasaltDB/handlers"
 	"github.com/spf13/cobra"
 )
 
@@ -20,18 +20,13 @@ configuration in the current Partition directory.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		partitionName, err := cmd.Flags().GetString("use")
-		partition, err := database.CollectPartition(partitionName)
 
 		if err != nil {
 			fmt.Println(err.Error())
 			return
 		}
-		err = database.RebalancePartition(partition)
 
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
+		handlers.RebalancePartitionHandler(partitionName)
 	},
 }
 

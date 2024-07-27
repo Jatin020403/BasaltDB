@@ -6,8 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/Jatin020403/BasaltDB/database"
-	"github.com/Jatin020403/BasaltDB/models"
+	"github.com/Jatin020403/BasaltDB/handlers"
 	"github.com/spf13/cobra"
 )
 
@@ -29,21 +28,7 @@ var initDefaultCmd = &cobra.Command{
 			return
 		}
 
-		var partition models.Partition
-		partition.Name = partitionName
-
-		partition, err = database.CreateTemplate(partition, n)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
-		partition, err = database.CreatePartition(partition)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
-
-		fmt.Println("Partition " + partitionName + " initialised")
+		handlers.InitDefaultHandler(partitionName, n)
 	},
 }
 

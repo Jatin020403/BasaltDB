@@ -9,5 +9,11 @@ run: build
 test:
 	@go test ./... 
 
+insert_data:
+	@for i in $(shell seq 1 100); do \
+		./bin/basaltdb insert key$$i value$$i; \
+	done
+
 %:
 	@:
+
