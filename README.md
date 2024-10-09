@@ -114,9 +114,9 @@ basaltdb -p test1 get --key 1
 ### View Data
 ```sh
 # Default Partition
-basaltdb getTree
+basaltdb getAll
 # test1 Partition
-basaltdb -p test1 getTree
+basaltdb -p test1 getAll
 ```
 
 ### Update Data

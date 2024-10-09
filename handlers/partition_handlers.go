@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Jatin020403/BasaltDB/database"
-	"github.com/Jatin020403/BasaltDB/models"
 )
 
 func CreatePartitionHandler(partitionName string) {
@@ -15,13 +14,14 @@ func CreatePartitionHandler(partitionName string) {
 		return
 	}
 
-	_, err = database.CreatePartition(partition)
+	err = partition.CreatePartition()
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	fmt.Println("Partition " + partitionName + " created")
 
+	fmt.Println(partition.Conf)
+	fmt.Println("Partition " + partitionName + " created")
 }
 
 func DeletePartitionHandler(partitionName string) {
@@ -31,7 +31,7 @@ func DeletePartitionHandler(partitionName string) {
 		return
 	}
 
-	err = database.DeletePartition(partition)
+	err = partition.DeletePartition()
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -41,10 +41,9 @@ func DeletePartitionHandler(partitionName string) {
 
 func InitHandler(partitionName string, n int) {
 
-	var partition models.Partition
-	partition.Name = partitionName
+	partition := database.InitPartition(partitionName, "")
 
-	partition, err := database.CreateTemplate(partition, n)
+	err := partition.CreateTemplate(n)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -55,19 +54,20 @@ func InitHandler(partitionName string, n int) {
 
 func InitDefaultHandler(partitionName string, n int) {
 
-	var partition models.Partition
-	partition.Name = partitionName
+	partition := database.InitPartition(partitionName, "")
 
-	partition, err := database.CreateTemplate(partition, n)
+	err := partition.CreateTemplate(n)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	partition, err = database.CreatePartition(partition)
+
+	err = partition.CreatePartition()
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
+	fmt.Println(partition)
 
 	fmt.Println("Partition " + partitionName + " initialised")
 }
@@ -103,5 +103,5 @@ func RenamePartitionHandler(fromPartitionName string, toPartitionName string) {
 
 	database.RenamePartition(fromPartition, toPartition)
 
-	database.DeletePartition(fromPartition)
+	fromPartition.DeletePartition()
 }

@@ -2,7 +2,7 @@
 
 # Record the start time
 start_time=$(date +%s)
-m=10000
+m=100
 
 # Loop to insert key-value pairs 100 times
 for i in $(seq 1 $m)

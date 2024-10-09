@@ -7,10 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// getTreecmd represents the insert command
-var getTreecmd = &cobra.Command{
-	Use:   "getTree",
-	Short: "getTree for Database",
+// getAllcmd represents the insert command
+var getAllcmd = &cobra.Command{
+	Use:   "getAll",
+	Short: "getAll for Database",
 	Long:  `This command inserts into database.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
@@ -27,11 +27,11 @@ var getTreecmd = &cobra.Command{
 			fmt.Println(err.Error())
 		}
 
-		handlers.GetTreeHandler(partitionName)
+		handlers.GetAllHandler(partitionName)
 
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(getTreecmd)
+	rootCmd.AddCommand(getAllcmd)
 }

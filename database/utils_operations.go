@@ -1,20 +1,15 @@
-package utils
+package database
 
 import (
 	"encoding/gob"
+	"errors"
 	"io"
 	"os"
 
-	"github.com/Jatin020403/BasaltDB/models"
-	"github.com/pkg/errors"
+	"github.com/Jatin020403/BasaltDB/data"
 )
 
-func CheckPathExists(path string) error {
-	_, err := os.Stat(path)
-	return err
-}
-
-func Serialize(partition models.Partition, part int, node *models.Node) error {
+func (partition Partition) putData(part int, object []data.DataNode) error {
 
 	// Check Partition exists
 	if err := CheckPathExists(partition.PartitionLoc); err != nil {
@@ -36,8 +31,6 @@ func Serialize(partition models.Partition, part int, node *models.Node) error {
 		}
 	}
 
-	object := bsf(node)
-
 	file, err := os.Create(path)
 
 	if err == nil {
@@ -51,7 +44,7 @@ func Serialize(partition models.Partition, part int, node *models.Node) error {
 	return err
 }
 
-func Deserialize(partition models.Partition, part int, object []models.ArrNode) ([]models.ArrNode, error) {
+func (partition Partition) getData(part int) ([]data.DataNode, error) {
 
 	var err error
 
@@ -81,10 +74,11 @@ func Deserialize(partition models.Partition, part int, object []models.ArrNode) 
 	}
 
 	decoder := gob.NewDecoder(file)
+	var object []data.DataNode
 	err = decoder.Decode(&object)
 
 	if errors.Is(err, io.EOF) {
-		return []models.ArrNode{}, nil
+		return []data.DataNode{}, nil
 	}
 
 	if err != nil {
@@ -96,4 +90,9 @@ func Deserialize(partition models.Partition, part int, object []models.ArrNode) 
 	file.Close()
 
 	return object, nil
+}
+
+func CheckPathExists(path string) error {
+	_, err := os.Stat(path)
+	return err
 }

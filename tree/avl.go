@@ -1,12 +1,20 @@
-package utils
+package tree
 
 import (
-	"errors"
 	"fmt"
-	"os"
 
-	"github.com/Jatin020403/BasaltDB/models"
+	"github.com/Jatin020403/BasaltDB/data"
 )
+
+type Tree struct {
+	Key       uint64
+	KeyString string
+	Value     string
+	Left      *Tree
+	Right     *Tree
+	Height    int
+	Timestamp int64
+}
 
 func max(a, b int) int {
 	if a > b {
@@ -15,15 +23,15 @@ func max(a, b int) int {
 	return b
 }
 
-func height(n *models.Node) int {
+func height(n *Tree) int {
 	if n == nil {
 		return 0
 	}
 	return n.Height
 }
 
-func NewNode(key uint64, value string, timestamp int64) *models.Node {
-	node := &models.Node{Key: key, Value: value}
+func NewNode(key uint64, keyString string, value string, timestamp int64) *Tree {
+	node := &Tree{Key: key, KeyString: keyString, Value: value, Timestamp: timestamp}
 	node.Left = nil
 	node.Right = nil
 	node.Height = 1
@@ -31,36 +39,7 @@ func NewNode(key uint64, value string, timestamp int64) *models.Node {
 	return node
 }
 
-func GetRoot(partition models.Partition, part int) (*models.Node, error) {
-	var arr []models.ArrNode
-	object, err := Deserialize(partition, part, arr)
-
-	if errors.Is(err, os.ErrNotExist) {
-		return nil, errors.New("getRoot : " + err.Error())
-	}
-
-	if err != nil {
-		return nil, errors.New("getRoot : " + err.Error())
-	}
-
-	var root *models.Node
-
-	for _, i := range object {
-		root = Insert(root, *NewNode(i.Key, i.Value, i.Timestamp))
-	}
-
-	return root, nil
-}
-
-func PutRoot(partition models.Partition, part int, node *models.Node) error {
-	err := Serialize(partition, part, node)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func rightRotate(y *models.Node) *models.Node {
+func rightRotate(y *Tree) *Tree {
 	x := y.Left
 	T2 := x.Right
 	x.Right = y
@@ -70,7 +49,7 @@ func rightRotate(y *models.Node) *models.Node {
 	return x
 }
 
-func leftRotate(x *models.Node) *models.Node {
+func leftRotate(x *Tree) *Tree {
 	y := x.Right
 	T2 := y.Left
 	y.Left = x
@@ -80,17 +59,17 @@ func leftRotate(x *models.Node) *models.Node {
 	return y
 }
 
-func get_balance_factor(N *models.Node) int {
+func get_balance_factor(N *Tree) int {
 	if N == nil {
 		return 0
 	}
 	return height(N.Left) - height(N.Right)
 }
 
-func Insert(node *models.Node, newNode models.Node) *models.Node {
+func Insert(node *Tree, newNode Tree) *Tree {
 
 	if node == nil {
-		return NewNode(newNode.Key, newNode.Value, newNode.Timestamp)
+		return NewNode(newNode.Key, newNode.KeyString, newNode.Value, newNode.Timestamp)
 	}
 	if newNode.Key < node.Key {
 		node.Left = Insert(node.Left, newNode)
@@ -129,7 +108,7 @@ func Insert(node *models.Node, newNode models.Node) *models.Node {
 	return node
 }
 
-func node_with_minimum_value(node *models.Node) *models.Node {
+func node_with_minimum_value(node *Tree) *Tree {
 	current := node
 	for current.Left != nil {
 		current = current.Left
@@ -137,7 +116,7 @@ func node_with_minimum_value(node *models.Node) *models.Node {
 	return current
 }
 
-func Delete(root *models.Node, key uint64) *models.Node {
+func Delete(root *Tree, key uint64) *Tree {
 
 	if root == nil {
 		return root
@@ -191,7 +170,7 @@ func Delete(root *models.Node, key uint64) *models.Node {
 	return root
 }
 
-func Get(node *models.Node, key uint64) *models.Node {
+func Get(node *Tree, key uint64) *Tree {
 	if node == nil {
 		return nil
 	}
@@ -204,7 +183,7 @@ func Get(node *models.Node, key uint64) *models.Node {
 	return node
 }
 
-func PrintRoot(root *models.Node, indent string, last bool) {
+func PrintRoot(root *Tree, indent string, last bool) {
 	if root == nil {
 		return
 	}
@@ -217,17 +196,33 @@ func PrintRoot(root *models.Node, indent string, last bool) {
 		fmt.Print("L----")
 		indent += "|  "
 	}
-	fmt.Println(" " + fmt.Sprint(root.Key) + "==>" + root.Value + " Timestamp: " + fmt.Sprint(root.Timestamp))
+	fmt.Println(" " + fmt.Sprint(root.KeyString) + "==>" + root.Value + " Timestamp: " + fmt.Sprint(root.Timestamp))
 
 	PrintRoot(root.Left, indent, false)
 	PrintRoot(root.Right, indent, true)
-
 }
 
-func Print_inorder(root *models.Node) {
+func Print_inorder(root *Tree) {
 	if root != nil {
 		Print_inorder(root.Left)
 		fmt.Println(fmt.Sprint(root.Key) + " : " + root.Value)
 		Print_inorder(root.Right)
 	}
+}
+
+func Deserialize(object []data.DataNode) (*Tree, error) {
+	var root *Tree
+
+	for _, n := range object {
+		root = Insert(root, *NewNode(n.Key, n.KeyString, n.Value, n.Timestamp))
+	}
+
+	return root, nil
+}
+
+func Serialize(root *Tree) ([]data.DataNode, error) {
+
+	dataArr := Bfs(root)
+
+	return dataArr, nil
 }
