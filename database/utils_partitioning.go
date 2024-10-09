@@ -128,7 +128,13 @@ func TransferPartitionData(fromPartition Partition, toPartition Partition) error
 
 		for part, dataArr := range toDataPartition {
 
-			err = toPartition.putData(part, dataArr)
+			existingArr, err := toPartition.getData(part)
+			if err != nil {
+				return err
+			}
+			existingArr = append(existingArr, dataArr...)
+			fmt.Println(existingArr)
+			err = toPartition.putData(part, existingArr)
 
 			if err != nil {
 				return err
@@ -169,60 +175,3 @@ func (partition *Partition) RenameInternalParts(toName string) error {
 
 	return nil
 }
-
-/*
-func PartitionInsertTree(rootOld *Node, rootNew *Node) error {
-	if root == nil {
-		return nil
-	}
-
-	var err error
-
-	part := int(root.key % uint64(partition.Conf.PartCount))
-
-	root, err = tree.Deserialize(partition, part)
-	if err != nil {
-		return err
-	}
-
-	err = partition.PartitionInsertTree(root.Left)
-	if err != nil {
-		return err
-	}
-
-	err = partition.PartitionInsertTree(root.Right)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-
-
-func PartitionInsertTree(partition models.Partition, root *models.Node) error {
-	if root == nil {
-		return nil
-	}
-
-	var err error
-
-	err = InsertOne(partition, root.Key, root.Value)
-	if err != nil {
-		return err
-	}
-
-	err = PartitionInsertTree(partition, root.Left)
-	if err != nil {
-		return err
-	}
-
-	err = PartitionInsertTree(partition, root.Right)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-*/

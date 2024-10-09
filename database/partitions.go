@@ -78,7 +78,7 @@ func (partition *Partition) CreateTemplate(n int) error {
 	return nil
 }
 
-func (partition Partition) CreatePartition() error {
+func (partition *Partition) CreatePartition() error {
 
 	err := CheckPathExists(partition.PartitionLoc)
 	if err != nil {

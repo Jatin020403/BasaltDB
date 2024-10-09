@@ -67,7 +67,6 @@ func InitDefaultHandler(partitionName string, n int) {
 		fmt.Println(err.Error())
 		return
 	}
-	fmt.Println(partition)
 
 	fmt.Println("Partition " + partitionName + " initialised")
 }
